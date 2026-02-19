@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNBLOCKED-GAMES71 | Flux Clicker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* CORE THEME COLORS */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-red: #ff3333;
+            --bg-dark: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            min-height: 100vh;
+        }
+
+        /* ANIMATED GRID BACKGROUND */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--glass) 1px, transparent 1px),
+                linear-gradient(90deg, var(--glass) 1px, transparent 1px);
+            background-size: 50px 50px;
+            perspective: 1000px;
+            transform: rotateX(60deg) translateY(-200px);
+            animation: moveGrid 20s linear infinite;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 1000px; }
+        }
+
+        /* HEADER */
+        header {
+            padding: 3rem 1rem;
+            text-align: center;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: var(--neon-pink);
+            letter-spacing: 4px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        /* CARD CONTAINER */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            gap: 40px; 
+            perspective: 1000px;
+        }
+
+        /* GENERAL CARD STYLES */
+        .game-card {
+            background: var(--glass);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px; 
+            transition: all 0.2s ease-out;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        /* LOCKED CARD SPECIFIC STYLES */
+        .game-card.locked {
+            border: 1px solid rgba(255, 51, 51, 0.5); /* Brighter red border */
+        }
+
+        /* Hover effects */
+        .game-card:not(.locked):hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.2);
+        }
+
+        .game-card.locked:hover {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* THUMBNAIL AREA */
+        .thumbnail-container {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #333;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .game-card:hover .game-img {
+            transform: scale(1.1);
+        }
+
+        /* STATIC BACKGROUND FOR LOCKED CARD */
+        .static-bg {
+            background: repeating-linear-gradient(
+                45deg,
+                #1a1a1a,
+                #1a1a1a 10px,
+                #222 10px,
+                #222 20px
+            );
+        }
+
+        .lock-text {
+            font-size: 5rem;
+            color: #333;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        }
+
+        /* TEXT STYLES */
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .game-desc {
+            color: #ccc;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* HIGH VISIBILITY FOR LOCKED TEXT */
+        .locked .game-title {
+            color: var(--neon-red);
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+        }
+        
+        .locked .game-desc {
+            color: white; /* Pure white for readability */
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        /* BUTTONS */
+        .play-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 15px 0;
+            background: transparent;
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .play-btn:hover {
+            background: var(--neon-pink);
+            color: white;
+            box-shadow: 0 0 25px var(--neon-pink);
+        }
+
+        /* DISABLED BUTTON STYLE */
+        .play-btn.disabled {
+            border-color: #444;
+            color: #666;
+            cursor: default;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .play-btn.disabled:hover {
+            box-shadow: none;
+            background: rgba(0,0,0,0.5);
+            color: #666;
+        }
+
+        /* SCANLINE */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+    <div class="scanline"></div>
+
+    <header>
+        <h1 class="logo">UNBLOCKED-GAMES71</h1>
+        <p class="tagline">SYSTEM STATUS: ONLINE // BYPASS ENABLED</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="game-card">
+            <div class="thumbnail-container">
+                <img src="resources/fc-thumbnail.png" alt="Flux Clicker" class="game-img">
+            </div>
+            <h3 class="game-title">FLUX CLICKER</h3>
+            <p class="game-desc">NEON ENERGETICS // SATISFYING</p>
+            <a href="/flux-clicker" class="play-btn">INITIATE_FLUX</a>
+        </div>
+
+        <div class="game-card locked">
+            <div class="thumbnail-container static-bg">
+                <div class="lock-text">?</div>
+            </div>
+            <h3 class="game-title">MORE GAMES</h3>
+            <p class="game-desc">COMING SOON</p>
+            <div class="play-btn disabled">LOCKED</div>
+        </div>
+
+    </div>
+
+    <script>
+        // Enhanced 3D Tilt for MULTIPLE cards
+        const cards = document.querySelectorAll('.game-card');
+
+        document.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 768) {
+                const x = (window.innerWidth / 2 - e.pageX) / 40;
+                const y = (window.innerHeight / 2 - e.pageY) / 40;
+                
+                cards.forEach(card => {
+                    card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
