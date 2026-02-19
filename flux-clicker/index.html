@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper Flux Clicker: Ultimate</title>
+    <style>
+        /* * =========================================
+         * CORE VARIABLES & THEME
+         * =========================================
+         */
+        :root {
+            /* Physics & Animation Curves */
+            --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+            --ease-slow-slide: cubic-bezier(0.2, 0.8, 0.2, 1);
+            
+            /* Dynamic Color System */
+            --hue: 270;
+            --saturation: 100%;
+            --lightness: 60%;
+            
+            --neon-color: hsl(var(--hue), var(--saturation), var(--lightness));
+            --neon-glow: hsl(var(--hue), var(--saturation), 40%);
+            --btn-gradient: linear-gradient(135deg, hsla(var(--hue), 100%, 20%, 0.95), hsla(calc(var(--hue) + 30), 100%, 10%, 0.95));
+            
+            --bg-dark: #050505;
+            --text-main: #ffffff;
+            --card-bg: rgba(20, 20, 30, 0.6);
+            --error-red: #ff0000; /* PURE RED */
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e, #000);
+        }
+
+        /* * =========================================
+         * BACKGROUND FX
+         * =========================================
+         */
+        .ambient-layer {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, hsla(var(--hue), 80%, 60%, 0.15) 0%, transparent 70%);
+            opacity: 0.6;
+            will-change: transform;
+        }
+
+        .bg-grid {
+            position: absolute;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.4;
+            transform: perspective(500px) rotateX(20deg);
+            z-index: 0;
+            pointer-events: none;
+            animation: grid-scroll 3s linear infinite;
+        }
+
+        @keyframes grid-scroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 50px; }
+        }
+
+        /* * =========================================
+         * GAME UI WRAPPER
+         * =========================================
+         */
+        .game-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            justify-content: center;
+            gap: 0.5rem; 
+        }
+
+        /* * =========================================
+         * COUNTER
+         * =========================================
+         */
+        .click-counter {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #fff;
+            height: 6rem;
+            position: relative;
+            margin-bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.05em;
+            text-shadow: 0 0 15px rgba(0,0,0,1), 0 0 30px var(--neon-glow), 0 0 50px var(--neon-color);
+            z-index: 100;
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+        }
+
+        .digit-wrapper {
+            position: relative;
+            height: 5rem;
+            width: 1ch; 
+            overflow: visible;
+            text-align: center;
+        }
+
+        .counter-digit {
+            position: absolute;
+            left: 0; width: 100%; top: 0;
+            height: 5rem;
+            line-height: 5rem;
+            display: flex; justify-content: center; align-items: center;
+            will-change: transform, opacity;
+        }
+
+        /* Animations */
+        .counter-digit.next-up { transform: translateY(120%); opacity: 0; }
+        .counter-digit.enter-up { animation: slideUpIn 0.5s var(--ease-slow-slide) forwards; }
+        .counter-digit.exit-up { animation: slideUpOut 0.5s var(--ease-slow-slide) forwards; }
+
+        .counter-digit.next-down { transform: translateY(-120%); opacity: 0; }
+        .counter-digit.enter-down { animation: slideDownIn 0.5s var(--ease-slow-slide) forwards; }
+        .counter-digit.exit-down { animation: slideDownOut 0.5s var(--ease-slow-slide) forwards; }
+
+        @keyframes slideUpIn { from { transform: translateY(120%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideUpOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-120%); opacity: 0; } }
+
+        @keyframes slideDownIn { from { transform: translateY(-120%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideDownOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(120%); opacity: 0; } }
+
+        /* * =========================================
+         * THE BUTTON
+         * =========================================
+         */
+        .btn-container {
+            position: relative;
+            padding: 30px; 
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            z-index: 10; 
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-hero {
+            position: relative;
+            appearance: none;
+            outline: none;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 0.15em;
+            padding: 2.5rem 6rem;
+            border-radius: 100px;
+            cursor: pointer;
+            z-index: 10;
+            background: transparent;
+            border: none;
+            transform-style: preserve-3d; 
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            will-change: transform;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-glow);
+        }
+
+        .btn-hit-area {
+            position: absolute;
+            inset: 0;
+            z-index: 100; 
+            transform: translateZ(35px); 
+            cursor: pointer;
+            border-radius: 100px;
+        }
+
+        .btn-base {
+            position: absolute;
+            inset: 0;
+            border-radius: 100px; 
+            overflow: hidden; 
+            background: var(--btn-gradient); 
+            border: 2px solid hsla(var(--hue), 100%, 70%, 0.5);
+            box-shadow: 
+                inset 0 0 20px hsla(var(--hue), 100%, 50%, 0.1),
+                0 0 20px hsla(var(--hue), 100%, 50%, 0.2),
+                0 0 40px hsla(var(--hue), 100%, 50%, 0.1),
+                0 20px 40px -10px rgba(0,0,0,0.8);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease; 
+            transform: translateZ(0);
+        }
+
+        .btn-stripes {
+            position: absolute;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: 0; 
+            background-image: repeating-linear-gradient(-45deg, transparent, transparent 10px, hsla(var(--hue), 100%, 80%, 0.3) 10px, hsla(var(--hue), 100%, 80%, 0.3) 20px);
+            animation: scroll-stripes 2s linear infinite;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            opacity: 0.65;
+        }
+
+        .btn-spotlight {
+            position: absolute;
+            top: 0; left: 0; width: 250%; height: 250%;
+            background: radial-gradient(circle at center, hsla(var(--hue), 100%, 90%, 0.15) 0%, transparent 60%);
+            transform: translate(calc(var(--x, 50%) - 50%), calc(var(--y, 50%) - 50%));
+            z-index: 4;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+        .btn-hero:hover .btn-spotlight { opacity: 1; }
+        .btn-hero:hover .btn-base { border-color: var(--neon-color); box-shadow: 0 0 50px var(--neon-color); }
+
+        .btn-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            pointer-events: none;
+            transform: translateZ(30px); 
+        }
+
+        .icon { width: 28px; height: 28px; stroke-width: 3; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px currentColor); }
+
+        @keyframes scroll-stripes { 0% { transform: translateX(0); } 100% { transform: translateX(-56.57px); } }
+
+        /* * =========================================
+         * COOLDOWN BAR & TIMER
+         * =========================================
+         */
+        .cooldown-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 20;
+            margin-bottom: 1.5rem; /* More space */
+        }
+
+        .cooldown-container {
+            width: 100%;
+            max-width: 600px; 
+            height: 10px; /* Thicker */
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .cooldown-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--neon-color);
+            box-shadow: 0 0 10px var(--neon-color);
+            transition: background-color 0.6s ease; 
+        }
+        
+        .cooldown-bar.error {
+            background-color: var(--error-red) !important;
+            box-shadow: 0 0 20px var(--error-red) !important;
+            transition: none; 
+        }
+
+        .cooldown-timer-text {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 8px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* * =========================================
+         * AUTO CLICKER & WALLET
+         * =========================================
+         */
+        .auto-dashboard {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 60vh;
+            max-height: 450px;
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 100px;
+            padding: 20px 0;
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
+            z-index: 20;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .auto-info-row {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-size: 0.75rem; color: rgba(255,255,255,0.9); font-weight: 600; text-align: center; width: 100%; gap: 5px;
+        }
+        .auto-label { color: rgba(255,255,255,0.5); font-weight: normal; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;}
+        #autoTimerText { font-family: monospace; font-size: 0.7rem; }
+        
+        .auto-progress-bg { width: 10px; height: 100%; background: rgba(0,0,0,0.4); border-radius: 5px; overflow: hidden; position: relative; flex-grow: 1; }
+        .auto-progress-fill { width: 100%; height: 0%; background: linear-gradient(to top, var(--neon-color), #fff); box-shadow: 0 0 10px var(--neon-color); position: absolute; bottom: 0; left: 0; }
+
+        .currency-container {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            display: flex; flex-direction: column; align-items: flex-start;
+            z-index: 100;
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .currency-label { font-size: 0.7rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 2px; }
+        .currency-value { font-family: monospace; font-size: 1.5rem; font-weight: 700; color: var(--neon-color); text-shadow: 0 0 10px var(--neon-color); display: flex; gap: 1px; }
+        
+        .currency-digit { display: inline-block; will-change: transform; transform-origin: center bottom; }
+        .currency-digit.pop { animation: currencyPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes currencyPop { 0% { transform: scale(1.5); color: #fff; } 100% { transform: scale(1); color: var(--neon-color); } }
+
+        /* * =========================================
+         * SHOP
+         * =========================================
+         */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem; 
+            width: 100%;
+            max-width: 600px; 
+            position: relative;
+            z-index: 20;
+            padding-bottom: 1rem;
+        }
+
+        .upgrade-card {
+            background: rgba(20, 20, 30, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px; 
+            padding: 1.25rem; 
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: visible;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        
+        .upgrade-card:hover { background: rgba(60, 60, 80, 0.7); border-color: var(--neon-color); transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .upgrade-card:active { transform: scale(0.98); }
+        .upgrade-card.disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
+
+        .upgrade-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .upgrade-name { font-weight: 800; font-size: 1rem; color: #fff; letter-spacing: 0.02em; }
+        .upgrade-cost { font-family: monospace; color: var(--neon-color); font-weight: 700; font-size: 0.9rem; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;}
+        .upgrade-desc { font-size: 0.8rem; color: rgba(255,255,255,0.8); line-height: 1.3; }
+        .upgrade-lvl { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: auto; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+
+        /* Tooltips */
+        .upgrade-card[data-tooltip]::before {
+            content: attr(data-tooltip);
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-10px);
+            background: rgba(0, 0, 0, 0.9); color: var(--neon-color); padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; border: 1px solid rgba(255,255,255,0.1); font-weight: 600; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .upgrade-card[data-tooltip]::after {
+            content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-5px); border: 6px solid transparent; border-top-color: rgba(0, 0, 0, 0.9); opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 100;
+        }
+        .upgrade-card:hover[data-tooltip]::before { opacity: 1; transform: translateX(-50%) translateY(-15px); }
+        .upgrade-card:hover[data-tooltip]::after { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+
+        /* * =========================================
+         * SETTINGS & MODAL
+         * =========================================
+         */
+        .settings-btn {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            z-index: 110; /* Above currency */
+            transition: all 0.2s ease;
+        }
+        .settings-btn:hover { background: var(--neon-color); box-shadow: 0 0 15px var(--neon-glow); transform: rotate(90deg); }
+        .settings-icon { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 9990; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .modal {
+            background: rgba(15, 15, 25, 0.95);
+            border: 1px solid var(--neon-color);
+            box-shadow: 0 0 30px var(--neon-glow);
+            border-radius: 16px;
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+            transform: translateY(20px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+        
+        .modal-title { font-size: 1.5rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        
+        .btn-reset {
+            background: rgba(50, 0, 0, 0.5);
+            border: 1px solid var(--error-red);
+            color: var(--error-red);
+            padding: 12px; border-radius: 8px;
+            font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;
+        }
+        .btn-reset:hover { background: var(--error-red); color: #fff; box-shadow: 0 0 15px var(--error-red); }
+
+        .btn-close {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-close:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
+
+
+        /* * =========================================
+         * PARTICLES & TOASTS
+         * =========================================
+         */
+        .particle {
+            position: absolute; pointer-events: none; background: radial-gradient(circle, #fff 10%, var(--part-color) 40%, transparent 70%); border-radius: 50%; width: var(--size); height: var(--size); left: 50%; top: 50%; will-change: transform, opacity; z-index: 1;
+        }
+
+        .toast-container {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column-reverse; gap: 10px; z-index: 9999; pointer-events: none; width: max-content; max-width: 90vw; align-items: center;
+        }
+        .toast {
+            background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid var(--neon-color); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; pointer-events: auto; box-shadow: 0 5px 20px rgba(0,0,0,0.5); animation: toastSlideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center;
+        }
+        .toast.error { border-left-color: var(--error-red); }
+        .toast a { color: var(--neon-color); font-weight: 700; text-decoration: none; border-bottom: 1px dashed currentColor; margin-top: 2px; display: inline-block; }
+        .toast a:hover { border-bottom-style: solid; }
+
+        @keyframes toastSlideUp { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toastFadeOut { to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
+
+        /* * =========================================
+         * ONBOARDING TUTORIAL
+         * =========================================
+         */
+        
+        /* New Spotlight System */
+        #tutorialSpotlight {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            z-index: 9005;
+            /* The 'hole' effect created by a massive shadow */
+            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.85); 
+            border-radius: 20px; /* ROUNDED CORNERS FOR HOLE */
+            pointer-events: none; /* Allows clicks to pass through the hole */
+            transform: translate(-50%, -50%);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1); /* SMOOTH MOVEMENT */
+            opacity: 0;
+        }
+        #tutorialSpotlight.active {
+            opacity: 1;
+        }
+
+        .tutorial-dialog {
+            position: fixed;
+            z-index: 9010;
+            background: rgba(10, 15, 25, 0.95);
+            border: 1px solid var(--neon-color);
+            box-shadow: 0 0 30px var(--neon-glow);
+            border-radius: 12px;
+            padding: 25px;
+            width: 320px;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            pointer-events: none;
+            display: flex; flex-direction: column; gap: 15px;
+            text-align: center; /* Center the text! */
+        }
+        
+        body.tutorial-active .tutorial-dialog { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        
+        /* MINIMIZED STATE (Bottom Right) */
+        .tutorial-dialog.waiting {
+            top: auto !important; left: auto !important; bottom: 30px !important; right: 30px !important; width: 240px; transform: none !important; padding: 15px; gap: 5px;
+        }
+        .tutorial-dialog.waiting .fluxy-icon { transform: scale(0.7); top: -15px; left: 10px; }
+        .tutorial-dialog.waiting .tut-actions { display: none; }
+
+        .fluxy-icon {
+            width: 50px; 
+            height: 50px; 
+            background: #000; 
+            border: 2px solid var(--neon-color); 
+            border-radius: 50%; 
+            position: absolute; 
+            top: -25px; 
+            left: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5rem; 
+            box-shadow: 0 0 15px var(--neon-glow); 
+            z-index: 2; 
+            transition: all 0.3s;
+            /* Fix centering issues */
+            line-height: 1; 
+            padding-bottom: 2px; /* Visual adjustment for emoji baseline */
+        }
+
+        .tut-text-container { font-size: 0.95rem; line-height: 1.6; min-height: 3em; position: relative; }
+        .tut-cursor { display: inline-block; width: 2px; height: 1em; background: var(--neon-color); animation: blink 1s infinite; vertical-align: text-bottom; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .tut-actions { display: flex; justify-content: flex-end; margin-top: 5px; }
+        .tut-btn {
+            background: var(--btn-gradient); border: 1px solid var(--neon-color); color: #fff; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
+        }
+        .tut-btn:hover { background: var(--neon-color); box-shadow: 0 0 15px var(--neon-glow); transform: translateY(-2px); }
+        .tut-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); transform: none; box-shadow: none; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+    <div class="ambient-layer" id="ambientLayer"></div>
+    
+    <!-- NEW SPOTLIGHT ELEMENT -->
+    <div id="tutorialSpotlight"></div>
+    
+    <!-- SETTINGS BUTTON -->
+    <button class="settings-btn" id="settingsBtn">
+        <svg class="settings-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+    </button>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-title">Settings</div>
+            <button class="btn-reset" id="resetBtn">Reset Progress</button>
+            <button class="btn-close" id="closeSettingsBtn">Close</button>
+        </div>
+    </div>
+    
+    <!-- TUTORIAL DIALOG -->
+    <div class="tutorial-dialog" id="tutDialog">
+        <div class="fluxy-icon">🤖</div>
+        <div class="tut-text-container">
+            <span id="tutText"></span><span class="tut-cursor"></span>
+        </div>
+        <div class="tut-actions">
+            <button class="tut-btn" id="tutNextBtn">Next</button>
+        </div>
+    </div>
+    
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- CURRENCY DISPLAY (Top Left) -->
+    <div class="currency-container" id="currencyContainer">
+        <div class="currency-label">FLUX BALANCE</div>
+        <div class="currency-value" id="currencyDisplay"></div>
+    </div>
+
+    <!-- AUTO CLICKER DASHBOARD (Vertical Right) -->
+    <div class="auto-dashboard" id="autoDashboard" style="opacity: 0.5;">
+        <div class="auto-info-row">
+            <span class="auto-label">Auto</span>
+            <span id="autoTimerText">--</span>
+        </div>
+        <div class="auto-progress-bg">
+            <div class="auto-progress-fill" id="autoProgressBar"></div>
+        </div>
+    </div>
+
+    <div class="game-wrapper">
+        
+        <div class="click-counter" id="counterDisplay">
+             <div class="digit-wrapper"><span class="counter-digit current">0</span></div>
+        </div>
+
+        <div class="btn-container" id="btnContainer">
+            <button class="btn-hero" id="megaButton">
+                <!-- HIT AREA: Guaranteed click target -->
+                <div class="btn-hit-area"></div>
+                
+                <!-- Visual Layers -->
+                <div class="btn-base">
+                    <div class="btn-stripes"></div>
+                    <div class="btn-spotlight"></div>
+                </div>
+                <!-- Content Layer -->
+                <div class="btn-content">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                    <span>INCREMENT</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- COOLDOWN UI (Wrapped for Targeting) -->
+        <div class="cooldown-wrapper" id="cooldownWrapper">
+            <div class="cooldown-container">
+                <div class="cooldown-bar" id="cooldownBar"></div>
+            </div>
+            <div class="cooldown-timer-text" id="cooldownTimer">0.00s</div>
+        </div>
+
+        <div class="shop-grid" id="shopGrid">
+            <!-- JS Populated -->
+        </div>
+
+    </div>
+
+    <script>
+        // --- GAME DATA & STATE ---
+        const defaultState = {
+            totalScore: 0, 
+            currency: 0,   
+            clickVal: 1, 
+            autoVal: 1, 
+            autoRate: 5000, 
+            cooldown: 500, 
+            lastClick: 0,
+            tutorialActive: false,
+            tutorialWaiting: false,
+            tutorialClicks: 0,
+            tutorialFinished: false,
+            unlockedUpgrades: {}, 
+            upgrades: {
+                click_val: { name: "Mouse Power", desc: "Increases the points you get for every single click.", base: 15, mult: 1.5, lvl: 1, icon: "⚡" },
+                auto_rate: { name: "Auto Speed", desc: "Makes the auto-clicker generate points faster.", base: 50, mult: 1.8, lvl: 0, icon: "⏩" },
+                auto_val:  { name: "Passive Income", desc: "Increases the points generated automatically.", base: 70, mult: 1.6, lvl: 0, icon: "💎" },
+                cooldown:  { name: "Cooling System", desc: "Reduces the delay between clicks.", base: 70, mult: 2.0, lvl: 0, icon: "❄️" }
+            }
+        };
+
+        // Deep copy default state to actual game state
+        let gameState = JSON.parse(JSON.stringify(defaultState));
+        gameState.lastAutoClick = Date.now();
+        gameState.autoTimer = null;
+
+        // --- VISUAL STATE ---
+        const hues = [270, 275, 290, 300, 320, 340, 350, 0, 10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240];
+        let lastHueIndex = -1;
+        let particles = [];
+        let ambientOrbs = [];
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2, shockwave = 0;
+        let phys = { scale: 1, scaleTarget: 1, scaleVel: 0, rotX: 0, rotXTarget: 0, rotY: 0, rotYTarget: 0, wobbleX: 0, wobbleVelX: 0, wobbleY: 0, wobbleVelY: 0, wobbleZ: 0, wobbleVelZ: 0, isHovering: false, isPressing: false };
+
+        // DOM
+        const btn = document.getElementById('megaButton');
+        const container = document.querySelector('.btn-container');
+        const counterEl = document.getElementById('counterDisplay');
+        const barEl = document.getElementById('cooldownBar');
+        const timerEl = document.getElementById('cooldownTimer');
+        const shopEl = document.getElementById('shopGrid');
+        const ambientLayer = document.getElementById('ambientLayer');
+        const currencyEl = document.getElementById('currencyDisplay');
+        const autoDashEl = document.getElementById('autoDashboard');
+        const autoBarEl = document.getElementById('autoProgressBar');
+        const autoTextEl = document.getElementById('autoTimerText');
+
+        // Settings DOM
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Sounds
+        const sndHold = new Audio('hold.mp3');
+        const sndRel = new Audio('release.mp3');
+        const sndError = new Audio('x.wav');
+        const sndBuy = new Audio('bump.wav'); 
+        const sndAuto = new Audio('Click6.wav');
+        const sndType = new Audio('pop2.wav');
+        let currentPitch = 1.0;
+
+        // --- SAVE/LOAD SYSTEM ---
+        function saveGame() {
+            // Don't save transient state like timer IDs
+            const saveObj = { ...gameState };
+            delete saveObj.autoTimer;
+            localStorage.setItem('hyperFluxSave', JSON.stringify(saveObj));
+            // console.log("Game Saved");
+        }
+
+        function loadGame() {
+            const save = localStorage.getItem('hyperFluxSave');
+            if (save) {
+                try {
+                    const parsed = JSON.parse(save);
+                    // Merge saved state into current state
+                    // We check each key to avoid overwriting new features if we add them later
+                    Object.keys(parsed).forEach(key => {
+                        if (key !== 'autoTimer') {
+                            gameState[key] = parsed[key];
+                        }
+                    });
+                    
+                    // Restore Auto Clicker
+                    if (gameState.upgrades.auto_rate.lvl > 0) {
+                        restartAutoClicker();
+                    }
+                    return true;
+                } catch(e) {
+                    console.error("Save file corrupted, resetting.", e);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        function resetGame() {
+            if (confirm("Are you sure you want to wipe all progress? This cannot be undone.")) {
+                localStorage.removeItem('hyperFluxSave');
+                location.reload();
+            }
+        }
+
+        // --- SETTINGS EVENTS ---
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.classList.add('open');
+        });
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('open');
+        });
+        resetBtn.addEventListener('click', resetGame);
+        // Close modal on outside click
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) settingsModal.classList.remove('open');
+        });
+
+        // --- TUTORIAL SYSTEM ---
+        const Tutorial = {
+            step: 0,
+            typeInterval: null,
+            steps: [
+                {
+                    targetId: 'btnContainer',
+                    text: "Yo, welcome to the Flux. I'm <strong>Fluxy</strong>.<br> See that big shiny button? That's your job. Smash it 3 times to wake up the system.",
+                    btnText: "Okay, I'll smash it",
+                    action: 'click', 
+                    requiredClicks: 3,
+                    padding: 0
+                },
+                {
+                    targetId: 'cooldownWrapper',
+                    text: "Whoa, take it easy! See that <strong>Cooldown Bar</strong>? If you click while it's red, you'll jam the core. Keep it cool, operator.",
+                    btnText: "Got it",
+                    action: 'next',
+                    padding: 20
+                },
+                {
+                    targetId: 'counterDisplay',
+                    text: "That big number is your <strong>Lifetime Score</strong>. It's your legacy. It never goes down, so you can brag about it later.",
+                    btnText: "Nice",
+                    action: 'next',
+                    padding: 10
+                },
+                {
+                    targetId: 'currencyContainer',
+                    text: "This up here? That's your <strong>Flux Balance</strong>. That's your cold hard cash. You use this to buy upgrades.",
+                    btnText: "Cha-ching!",
+                    action: 'next',
+                    specialPos: 'bottom-right',
+                    padding: 0
+                },
+                {
+                    targetId: 'shopGrid',
+                    text: "And finally, the <strong>Shop</strong>. Buy stuff here to click faster, earn more, and automate your empire. Now get to work!",
+                    btnText: "Let's Go!",
+                    action: 'finish',
+                    padding: 10
+                }
+            ],
+            
+            init() {
+                this.dialog = document.getElementById('tutDialog');
+                this.textEl = document.getElementById('tutText');
+                this.nextBtn = document.getElementById('tutNextBtn');
+                this.spotlight = document.getElementById('tutorialSpotlight');
+                
+                // Plays bump.wav (which is loaded as sndBuy) when clicking OK
+                this.nextBtn.addEventListener('click', () => {
+                    const clickSound = sndBuy.cloneNode();
+                    clickSound.playbackRate = 1.0 + Math.random() * 0.2; 
+                    clickSound.play().catch(() => {});
+                    this.confirmStep();
+                });
+                
+                document.body.classList.add('tutorial-active');
+                gameState.tutorialActive = true;
+                gameState.tutorialClicks = 0; // Reset tutorial click progress to prevent "instant finish" if reloaded
+                this.showStep(0);
+            },
+            
+            showStep(index) {
+                this.step = index;
+                const data = this.steps[index];
+                
+                // Reset waiting state
+                gameState.tutorialWaiting = false;
+                this.dialog.classList.remove('waiting');
+                
+                // Update Spotlight Position & Size
+                const target = document.getElementById(data.targetId);
+                
+                if (target) {
+                    const rect = target.getBoundingClientRect();
+                    const padding = data.padding !== undefined ? data.padding : 10;
+                    
+                    // Activate spotlight
+                    this.spotlight.classList.add('active');
+                    this.spotlight.style.top = (rect.top + rect.height / 2) + 'px';
+                    this.spotlight.style.left = (rect.left + rect.width / 2) + 'px';
+                    this.spotlight.style.width = (rect.width + padding * 2) + 'px';
+                    this.spotlight.style.height = (rect.height + padding * 2) + 'px';
+
+                    // Position Dialog relative to target (keeping logic similar but refined)
+                    const dialogHeight = this.dialog.offsetHeight || 200;
+                    const dialogWidth = 320;
+                    
+                    let top, left;
+
+                    if (data.specialPos === 'bottom-right') {
+                        top = rect.bottom + 20 + padding;
+                        left = rect.left;
+                    } else {
+                        // Default Centered Below
+                        top = rect.bottom + 20 + padding;
+                        left = rect.left + (rect.width/2) - (dialogWidth/2);
+                    }
+                    
+                    // Boundary checks
+                    if (top + dialogHeight > window.innerHeight) top = rect.top - dialogHeight - 20 - padding; 
+                    if (left < 20) left = 20;
+                    if (left + dialogWidth > window.innerWidth) left = window.innerWidth - dialogWidth - 20;
+                    
+                    this.dialog.style.top = `${top}px`;
+                    this.dialog.style.left = `${left}px`;
+                    
+                } else {
+                    // Fallback to center if no target
+                    this.spotlight.classList.remove('active');
+                    this.dialog.style.top = '50%';
+                    this.dialog.style.left = '50%';
+                    this.dialog.style.transform = 'translate(-50%, -50%)';
+                }
+
+                this.nextBtn.textContent = data.btnText || "Next";
+                this.typeText(data.text);
+            },
+            
+            confirmStep() {
+                const data = this.steps[this.step];
+                if (data.action === 'click') {
+                    gameState.tutorialWaiting = true;
+                    // Keep spotlight active so user knows where to click!
+                    
+                    // Move to bottom right waiting position
+                    this.dialog.classList.add('waiting'); 
+                    this.textEl.innerHTML = `Waiting... <strong>0/${data.requiredClicks}</strong> clicks`;
+                } else if (data.action === 'finish') {
+                    this.end();
+                } else {
+                    this.nextStep();
+                }
+                saveGame(); // Save after confirming a step
+            },
+            
+            typeText(html) {
+                if (this.typeInterval) clearInterval(this.typeInterval);
+                this.textEl.innerHTML = '';
+                
+                // Disable button while typing
+                this.nextBtn.disabled = true;
+
+                const tokens = html.split(/(<[^>]+>)/g).filter(x => x);
+                let tokenIndex = 0;
+                let charIndex = 0;
+                
+                this.typeInterval = setInterval(() => {
+                    if (tokenIndex >= tokens.length) {
+                        clearInterval(this.typeInterval);
+                        this.nextBtn.disabled = false; // Re-enable button
+                        return;
+                    }
+                    const token = tokens[tokenIndex];
+                    if (token.startsWith('<')) {
+                        this.textEl.innerHTML += token;
+                        tokenIndex++;
+                        charIndex = 0;
+                    } else {
+                        const nextChar = token[charIndex];
+                        this.textEl.innerHTML += nextChar;
+                        
+                        // Play sound with cloneNode to allow overlapping (stacking)
+                        const audioClone = sndType.cloneNode();
+                        audioClone.playbackRate = 0.7 + Math.random() * 0.6; // Wider random pitch range
+                        audioClone.volume = 0.3; // Lower volume since they overlap
+                        audioClone.play().catch(() => {});
+
+                        charIndex++;
+                        if (charIndex >= token.length) {
+                            tokenIndex++;
+                            charIndex = 0;
+                        }
+                    }
+                }, 30); // Speed
+            },
+            
+            nextStep() {
+                if (this.step < this.steps.length - 1) this.showStep(this.step + 1);
+                else this.end();
+            },
+            
+            registerClick() {
+                if (gameState.tutorialWaiting && this.steps[this.step].action === 'click') {
+                    gameState.tutorialClicks++;
+                    const req = this.steps[this.step].requiredClicks;
+                    const left = req - gameState.tutorialClicks;
+                    this.textEl.innerHTML = `Nice! <strong>${gameState.tutorialClicks}/${req}</strong> clicks`;
+                    if (left <= 0) {
+                        setTimeout(() => this.nextStep(), 500);
+                    }
+                }
+            },
+            
+            end() {
+                document.body.classList.remove('tutorial-active');
+                gameState.tutorialActive = false;
+                gameState.tutorialWaiting = false;
+                gameState.tutorialFinished = true; // Mark finished
+                saveGame(); // Save state
+                this.spotlight.classList.remove('active');
+                // Remove inline styles to clean up
+                this.spotlight.style.width = '0';
+                this.spotlight.style.height = '0';
+            }
+        };
+
+        // --- INIT ---
+        function init() {
+            // Attempt load
+            const hasSave = loadGame();
+            
+            renderShop();
+            initAmbientOrbs();
+            updateCounter('up'); 
+            updateCurrency(); 
+            checkAutoVisibility();
+            loop(); 
+            
+            // Auto-Save Interval
+            setInterval(saveGame, 1000); // 1s
+            
+            // Start tutorial only if not finished
+            if (!gameState.tutorialFinished) {
+                setTimeout(() => Tutorial.init(), 800);
+            }
+        }
+        
+        function checkAutoVisibility() {
+            if(gameState.upgrades.auto_rate.lvl > 0) autoDashEl.style.opacity = 1;
+        }
+
+        // --- TOASTS ---
+        function showToast(html, type = 'neutral') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = html;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'toastFadeOut 0.3s forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- SHOP & GAMEPLAY ---
+        function renderShop() {
+            shopEl.innerHTML = '';
+            for (const [key, u] of Object.entries(gameState.upgrades)) {
+                const cost = Math.floor(u.base * Math.pow(u.mult, u.lvl));
+                const div = document.createElement('div');
+                div.className = 'upgrade-card';
+                if (gameState.currency < cost) div.classList.add('disabled');
+                
+                let tooltipText = "";
+                if (key === 'click_val') tooltipText = `Current: ${gameState.clickVal} pts/click`;
+                else if (key === 'auto_rate') tooltipText = `Interval: ${(gameState.autoRate/1000).toFixed(1)}s`;
+                else if (key === 'auto_val') tooltipText = `Generate: ${gameState.autoVal} pts`;
+                else if (key === 'cooldown') tooltipText = `Delay: ${(gameState.cooldown/1000).toFixed(2)}s`;
+                
+                div.setAttribute('data-tooltip', tooltipText);
+                div.innerHTML = `
+                    <div class="upgrade-top">
+                        <span class="upgrade-icon">${u.icon} ${u.name}</span>
+                        <span class="upgrade-cost">${cost.toLocaleString()}</span>
+                    </div>
+                    <div class="upgrade-desc">${u.desc}</div>
+                    <div class="upgrade-lvl">Level ${u.lvl}</div>
+                `;
+                div.onclick = (e) => {
+                    e.stopPropagation(); 
+                    if (!gameState.tutorialActive) buyUpgrade(key, cost); 
+                };
+                shopEl.appendChild(div);
+            }
+        }
+
+        function checkAffordability() {
+            for (const [key, u] of Object.entries(gameState.upgrades)) {
+                const cost = Math.floor(u.base * Math.pow(u.mult, u.lvl));
+                const unlockKey = `${key}_${u.lvl}`;
+                if (gameState.currency >= cost && !gameState.unlockedUpgrades[unlockKey]) {
+                    gameState.unlockedUpgrades[unlockKey] = true;
+                    showToast(`<strong>${u.name}</strong> is now available!`, 'success');
+                    saveGame(); // Save on significant progress
+                }
+            }
+        }
+
+        function buyUpgrade(key, cost) {
+            const u = gameState.upgrades[key];
+            if (gameState.currency >= cost) {
+                gameState.currency -= cost;
+                gameState.upgrades[key].lvl++;
+                
+                if (key === 'click_val') gameState.clickVal++;
+                if (key === 'auto_val') gameState.autoVal++;
+                if (key === 'cooldown') gameState.cooldown *= 0.95;
+                if (key === 'auto_rate') {
+                    gameState.autoRate = Math.max(100, 5000 * Math.pow(0.8, gameState.upgrades.auto_rate.lvl));
+                    restartAutoClicker();
+                    checkAutoVisibility();
+                }
+                
+                sndBuy.currentTime = 0; sndBuy.play().catch(()=>{});
+                showToast(`Purchased <strong>${u.name}</strong> (Level ${u.lvl})!`, 'success');
+                updateCurrency(); renderShop(); spawnParticles(mouseX, mouseY, 10, true);
+                saveGame(); // Save on purchase
+            } else {
+                const missing = Math.ceil(cost - gameState.currency);
+                sndError.currentTime = 0; sndError.play().catch(()=>{});
+                showToast(`<div>Insufficient funds. You need <strong>${missing.toLocaleString()}</strong> more Flux.</div><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Buy more Flux here</a>`, 'error');
+            }
+        }
+
+        function restartAutoClicker() {
+            if (gameState.autoTimer) clearInterval(gameState.autoTimer);
+            gameState.lastAutoClick = Date.now();
+            if (gameState.upgrades.auto_rate.lvl > 0) {
+                gameState.autoTimer = setInterval(() => {
+                    gameState.totalScore += gameState.autoVal;
+                    gameState.currency += gameState.autoVal;
+                    gameState.lastAutoClick = Date.now(); 
+                    const s = sndAuto.cloneNode(); s.volume = 0.5; s.play().catch(()=>{});
+                    updateCounter('up'); updateCurrency(); renderShop(); checkAffordability();
+                }, gameState.autoRate);
+            }
+        }
+
+        function updateCurrency() {
+            const nextStr = Math.floor(gameState.currency).toLocaleString();
+            const container = document.getElementById('currencyDisplay');
+            if (container.childNodes.length > 0 && container.children.length === 0) container.innerHTML = '';
+            while (container.children.length > nextStr.length) container.removeChild(container.lastChild);
+            while (container.children.length < nextStr.length) {
+                const sp = document.createElement('span');
+                sp.className = 'currency-digit';
+                container.appendChild(sp);
+            }
+            const kids = container.children;
+            for (let i = 0; i < nextStr.length; i++) {
+                const char = nextStr[i];
+                const kid = kids[i];
+                if (kid.textContent !== char) {
+                    kid.textContent = char;
+                    if (/[0-9]/.test(char)) {
+                        kid.classList.remove('pop');
+                        void kid.offsetWidth; 
+                        kid.classList.add('pop');
+                    }
+                }
+            }
+        }
+
+        // --- INPUT HANDLING ---
+        window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+        btn.addEventListener('mouseenter', () => { phys.isHovering = true; phys.scaleTarget = 1.05; });
+        btn.addEventListener('mouseleave', () => { phys.isHovering = false; phys.scaleTarget = 1.0; });
+
+        btn.addEventListener('mousedown', (e) => {
+            phys.isPressing = true;
+            phys.scaleTarget = 0.90;
+            currentPitch = 0.8 + Math.random() * 0.4;
+            sndHold.playbackRate = currentPitch; sndHold.currentTime = 0; sndHold.play().catch(()=>{});
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!phys.isPressing) return;
+            phys.isPressing = false;
+            
+            const now = Date.now();
+            const timeDiff = now - gameState.lastClick;
+
+            if (timeDiff < gameState.cooldown) {
+                // CSS animation was conflicting with physics transform.
+                // Instead of classList, we trigger a physics wobble.
+                phys.wobbleX = (Math.random()-0.5) * 20; 
+                phys.wobbleY = (Math.random()-0.5) * 20;
+                
+                barEl.classList.remove('error'); void barEl.offsetWidth; barEl.classList.add('error');
+                setTimeout(() => barEl.classList.remove('error'), 50);
+                phys.scaleTarget = phys.isHovering ? 1.05 : 1.0;
+                sndError.currentTime = 0; sndError.play().catch(()=>{});
+            } else {
+                gameState.lastClick = now;
+                gameState.totalScore += gameState.clickVal;
+                gameState.currency += gameState.clickVal;
+                
+                if (gameState.tutorialActive && gameState.tutorialWaiting) Tutorial.registerClick();
+
+                updateCounter('up'); updateCurrency(); renderShop(); checkAffordability();
+                
+                // SAVE GAME ON EVERY CLICK
+                saveGame();
+                
+                let newIndex;
+                do { newIndex = Math.floor(Math.random() * hues.length); } while(newIndex === lastHueIndex);
+                lastHueIndex = newIndex;
+                const newHue = hues[newIndex];
+                document.documentElement.style.setProperty('--hue', newHue);
+                updateGradient(newHue);
+                
+                spawnParticles(mouseX, mouseY, 25, false, newHue);
+                shockwave = 1500;
+                
+                // Stronger physics impulse on success
+                phys.wobbleVelX += (Math.random() - 0.5) * 50; 
+                phys.wobbleVelY += (Math.random() - 0.5) * 50; 
+                phys.wobbleVelZ += (Math.random() - 0.5) * 25;
+                
+                phys.scaleTarget = phys.isHovering ? 1.05 : 1.0;
+                sndRel.playbackRate = currentPitch; sndRel.currentTime = 0; sndRel.play().catch(()=>{});
+            }
+        });
+
+        function updateGradient(baseHue) {
+            const hue2 = (baseHue + 30) % 360;
+            const grad = `linear-gradient(135deg, hsla(${baseHue}, 100%, 20%, 0.95), hsla(${hue2}, 100%, 10%, 0.95))`;
+            document.documentElement.style.setProperty('--btn-gradient', grad);
+        }
+
+        function loop() {
+            const now = Date.now();
+            const diff = now - gameState.lastClick;
+            let pct = 100 - (diff / gameState.cooldown * 100);
+            if (pct < 0) pct = 0;
+            barEl.style.width = `${pct}%`;
+            
+            const remaining = Math.max(0, gameState.cooldown - diff);
+            timerEl.textContent = (remaining / 1000).toFixed(2) + "s";
+            timerEl.style.color = remaining > 0 ? "rgba(255,100,100,0.8)" : "rgba(255,255,255,0.4)";
+            
+            if(gameState.upgrades.auto_rate.lvl > 0) {
+                const autoDiff = now - gameState.lastAutoClick;
+                const autoPct = Math.min(100, (autoDiff / gameState.autoRate * 100));
+                autoBarEl.style.height = `${autoPct}%`;
+                const timeToNext = Math.max(0, gameState.autoRate - autoDiff);
+                autoTextEl.textContent = `+${gameState.autoVal}\n${(timeToNext/1000).toFixed(1)}s`;
+                autoTextEl.style.color = "#fff"; autoTextEl.style.whiteSpace = "pre";
+            } else {
+                autoTextEl.textContent = "Inactive";
+            }
+
+            const rect = btn.getBoundingClientRect();
+            const relX = mouseX - rect.left; const relY = mouseY - rect.top;
+            btn.style.setProperty('--x', `${relX}px`); btn.style.setProperty('--y', `${relY}px`);
+
+            const cx = window.innerWidth / 2; const cy = window.innerHeight / 2;
+            const maxTilt = 15;
+            const dx = (mouseX - cx) / cx; const dy = (mouseY - cy) / cy;
+            phys.rotXTarget = dy * -maxTilt; phys.rotYTarget = dx * maxTilt;
+            
+            phys.rotX += (phys.rotXTarget - phys.rotX) * 0.1; phys.rotY += (phys.rotYTarget - phys.rotY) * 0.1;
+            const force = (phys.scaleTarget - phys.scale) * 0.15;
+            phys.scaleVel += force; phys.scaleVel *= 0.65; phys.scale += phys.scaleVel;
+
+            const wobbleK = 0.2, wobbleD = 0.85;
+            phys.wobbleVelX += -phys.wobbleX * wobbleK; phys.wobbleVelX *= wobbleD; phys.wobbleX += phys.wobbleVelX;
+            phys.wobbleVelY += -phys.wobbleY * wobbleK; phys.wobbleVelY *= wobbleD; phys.wobbleY += phys.wobbleVelY;
+            phys.wobbleVelZ += -phys.wobbleZ * wobbleK; phys.wobbleVelZ *= wobbleD; phys.wobbleZ += phys.wobbleVelZ;
+
+            const transform = `translate3d(${phys.wobbleX.toFixed(2)}px, ${phys.wobbleY.toFixed(2)}px, 0) rotateX(${phys.rotX.toFixed(2)}deg) rotateY(${phys.rotY.toFixed(2)}deg) rotateZ(${phys.wobbleZ.toFixed(2)}deg) scale(${phys.scale.toFixed(4)})`;
+            btn.style.transform = transform;
+
+            shockwave *= 0.9;
+            updateParticles(); updateAmbientOrbs(cx, cy);
+            requestAnimationFrame(loop);
+        }
+
+        function spawnParticles(x, y, count, isShop = false, hue = null) {
+            const containerEl = isShop ? document.body : container;
+            const baseHue = hue || parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hue'));
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.classList.add('particle');
+                const size = isShop ? 5 + Math.random()*5 : 10 + Math.random()*20;
+                const lightness = 50 + Math.random() * 40;
+                el.style.setProperty('--part-color', `hsl(${baseHue}, 100%, ${lightness}%)`);
+                el.style.setProperty('--size', `${size}px`);
+                if(isShop) { el.style.left = `${x}px`; el.style.top = `${y}px`; }
+                containerEl.appendChild(el);
+                const angle = Math.random() * Math.PI * 2;
+                const speed = isShop ? 2 + Math.random()*5 : 10 + Math.random()*20;
+                particles.push({ element: el, x: 0, y: 0, z: isShop ? 0 : -10 - Math.random() * 50, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, gravity: 0.8, life: 1.0, decay: 0.01 + Math.random() * 0.02, isShop: isShop });
+            }
+        }
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.vx *= 0.95; p.life -= p.decay;
+                if (p.isShop) p.element.style.transform = `translate(${p.x}px, ${p.y}px)`;
+                else p.element.style.transform = `translate3d(calc(-50% + ${p.x}px), calc(-50% + ${p.y}px), ${p.z}px)`;
+                p.element.style.opacity = p.life;
+                if (p.life <= 0) { p.element.remove(); particles.splice(i, 1); }
+            }
+        }
+        function initAmbientOrbs() {
+            for(let i=0; i<20; i++) {
+                const el = document.createElement('div');
+                el.classList.add('ambient-orb');
+                const size = 50 + Math.random() * 200;
+                el.style.width = `${size}px`; el.style.height = `${size}px`;
+                ambientLayer.appendChild(el);
+                const vx = (Math.random()-0.5)*0.5; const vy = (Math.random()-0.5)*0.5;
+                ambientOrbs.push({ element: el, x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, vx, vy, baseVx: vx, baseVy: vy, scale: 0.5+Math.random()*0.5 });
+            }
+        }
+        function updateAmbientOrbs(cx, cy) {
+            for (let orb of ambientOrbs) {
+                if(orb.x < -200) orb.x = window.innerWidth+200; if(orb.x > window.innerWidth+200) orb.x = -200;
+                if(orb.y < -200) orb.y = window.innerHeight+200; if(orb.y > window.innerHeight+200) orb.y = -200;
+                const dx = orb.x - mouseX, dy = orb.y - mouseY, dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist < 300) { const f = (300-dist)/300; orb.vx += (dx/dist)*f*0.2; orb.vy += (dy/dist)*f*0.2; }
+                const dcx = orb.x - cx, dcy = orb.y - cy, dcenter = Math.sqrt(dcx*dcx + dcy*dcy);
+                if (phys.isPressing) { orb.vx -= (dcx/dcenter)*0.5; orb.vy -= (dcy/dcenter)*0.5; }
+                else if (shockwave > 1) { const imp = Math.max(0, (1500 - dcenter)/1500); orb.vx += (dcx/dcenter)*shockwave*0.05*imp; orb.vy += (dcy/dcenter)*shockwave*0.05*imp; }
+                orb.vx += (orb.baseVx - orb.vx)*0.02; orb.vy += (orb.baseVy - orb.vy)*0.02;
+                orb.x += orb.vx; orb.y += orb.vy;
+                orb.element.style.transform = `translate3d(${orb.x}px, ${orb.y}px, 0) scale(${orb.scale})`;
+            }
+        }
+
+        function updateCounter(direction = 'up') {
+            const nextStr = Math.floor(gameState.totalScore).toString();
+            while (counterEl.children.length > nextStr.length) counterEl.removeChild(counterEl.firstChild);
+            while (counterEl.children.length < nextStr.length) {
+                const wrap = document.createElement('div'); wrap.className = 'digit-wrapper';
+                const sp = document.createElement('span'); sp.className = 'counter-digit current'; sp.textContent = ''; 
+                wrap.appendChild(sp); counterEl.insertBefore(wrap, counterEl.firstChild);
+            }
+            const wrappers = Array.from(counterEl.children);
+            wrappers.forEach((wrapper, i) => {
+                const char = nextStr[i]; const currEl = wrapper.querySelector('.current'); const oldChar = currEl ? currEl.textContent : '';
+                if (oldChar !== char) {
+                    const nextEl = document.createElement('span'); nextEl.className = `counter-digit next-${direction}`; nextEl.textContent = char; wrapper.appendChild(nextEl);
+                    if (currEl) { currEl.classList.remove('current'); currEl.classList.add(`exit-${direction}`); setTimeout(() => currEl.remove(), 600); }
+                    void nextEl.offsetWidth; nextEl.classList.remove(`next-${direction}`); nextEl.classList.add(`enter-${direction}`, 'current');
+                }
+            });
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
