@@ -6,7 +6,6 @@
     <title>Wiki Speedrun</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -205,30 +204,53 @@
                     </div>
                     <select id="lobby-category-select" class="w-full bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl px-4 py-3 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-70">
                         <option value="any">🎲 Any (Completely Random)</option>
-                        <option value="history">🏛️ History</option>
-                        <option value="science">🔬 Science</option>
-                        <option value="geography">🌍 Geography</option>
-                        <option value="pop_culture">🍿 Pop Culture</option>
-                        <option value="food">🍕 Food & Drink</option>
-                        <option value="animals">🦁 Animals</option>
-                        <option value="video_games">🎮 Video Games</option>
+                        <optgroup label="General">
+                            <option value="history">🏛️ History</option>
+                            <option value="science">🔬 Science</option>
+                            <option value="geography">🌍 Geography</option>
+                            <option value="pop_culture">🍿 Pop Culture</option>
+                            <option value="food">🍕 Food (Cuisines & Dishes)</option>
+                            <option value="animals">🦁 Animals</option>
+                            <option value="tech">💻 Technology</option>
+                        </optgroup>
+                        <optgroup label="Niche & Fun">
+                            <option value="mythology">🔱 Mythology</option>
+                            <option value="video_games">🎮 Video Games</option>
+                            <option value="space">🚀 Space Exploration</option>
+                            <option value="internet_culture">🌐 Internet Culture</option>
+                            <option value="conspiracy">🛸 Conspiracy Theories</option>
+                            <option value="cryptids">👣 Cryptids & Folklore</option>
+                            <option value="unsolved">❓ Unsolved Mysteries</option>
+                            <option value="board_games">🎲 Board Games</option>
+                        </optgroup>
+                        <option value="custom">✏️ Custom (Choose Your Own)</option>
                     </select>
                 </div>
 
                 <div id="lobby-articles-preview" class="mb-6 bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-inner">
                     <p class="text-[0.65rem] font-bold text-slate-400 uppercase text-center mb-4 tracking-widest">Current Race Route</p>
                     <div class="flex flex-col space-y-4">
-                        <div class="flex flex-col items-center text-center">
+                        <div class="flex flex-col items-center text-center w-full">
                             <span class="text-[0.6rem] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 mb-1">Start Article</span>
-                            <span id="lobby-start-text" class="font-bold text-slate-800 text-lg leading-tight">Loading...</span>
+                            <span id="lobby-start-text" class="font-bold text-slate-800 text-lg leading-tight w-full break-words">Loading...</span>
+                            
+                            <div id="lobby-start-custom" class="hidden relative w-full mt-1">
+                                <input type="text" id="lobby-start-input" class="w-full bg-white border border-slate-300 text-slate-800 rounded-lg px-3 py-2 text-center text-sm font-bold focus:ring-2 focus:outline-none transition-colors" placeholder="Type Start Article...">
+                            </div>
                         </div>
+                        
                         <div class="flex justify-center relative">
                             <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200 border-dashed"></div></div>
                             <div class="relative bg-slate-50 px-3 text-slate-300"><i data-lucide="arrow-down" class="w-5 h-5"></i></div>
                         </div>
-                        <div class="flex flex-col items-center text-center">
+                        
+                        <div class="flex flex-col items-center text-center w-full">
                             <span class="text-[0.6rem] font-black text-rose-500 uppercase tracking-widest bg-rose-50 px-2 py-0.5 rounded border border-rose-100 mb-1">Target Article</span>
-                            <span id="lobby-target-text" class="font-bold text-slate-800 text-lg leading-tight">Loading...</span>
+                            <span id="lobby-target-text" class="font-bold text-slate-800 text-lg leading-tight w-full break-words">Loading...</span>
+                            
+                            <div id="lobby-target-custom" class="hidden relative w-full mt-1">
+                                <input type="text" id="lobby-target-input" class="w-full bg-white border border-slate-300 text-slate-800 rounded-lg px-3 py-2 text-center text-sm font-bold focus:ring-2 focus:outline-none transition-colors" placeholder="Type Target Article...">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -348,7 +370,7 @@
     </div>
 
     <script type="module">
-        // Upgraded CSS Block logic that injects full tailwind browser engine if CDN fails
+        // CSS Fallback
         setTimeout(() => {
             if (typeof tailwind === 'undefined') {
                 const script = document.createElement('script');
@@ -432,8 +454,8 @@
 
         // --- STATE ---
         const state = {
-            mode: 'single', // 'single' or 'multi'
-            status: 'menu', // 'menu', 'lobby', 'playing', 'won'
+            mode: 'single', 
+            status: 'menu', 
             category: 'any', 
             startArticle: '',
             targetArticle: '',
@@ -473,7 +495,13 @@
                 btnLeave: document.getElementById('btn-leave-lobby'), hostSettings: document.getElementById('lobby-host-settings'),
                 catSelect: document.getElementById('lobby-category-select'), preview: document.getElementById('lobby-articles-preview'),
                 previewStart: document.getElementById('lobby-start-text'), previewTarget: document.getElementById('lobby-target-text'),
-                btnRerollRoute: document.getElementById('btn-lobby-reroll')
+                btnRerollRoute: document.getElementById('btn-lobby-reroll'),
+                
+                // Lobby Custom specific DOM
+                previewStartCust: document.getElementById('lobby-start-custom'),
+                previewTargetCust: document.getElementById('lobby-target-custom'),
+                lobbyStartInput: document.getElementById('lobby-start-input'),
+                lobbyTargetInput: document.getElementById('lobby-target-input')
             },
             game: {
                 loadBar: document.getElementById('game-loading-bar'), targetDisp: document.getElementById('game-target-display'),
@@ -536,7 +564,7 @@
             }
         };
 
-        // --- MISSING TIMER & VALIDATION LOGIC RESTORED HERE ---
+        // --- VALIDATION & TIMER LOGIC ---
         const validateArticle = async (title, type) => {
             if (!title) {
                 if (type === 'start') { state.customStartValid = false; DOM.menu.startVal.style.opacity = 0; }
@@ -563,6 +591,47 @@
                 console.error("Validation error", err);
             }
         };
+
+        // MP Lobby Custom Mode Validation
+        const handleLobbyCustomInput = async (e, type) => {
+            if (!state.isHost) return;
+            clearTimeout(state.typingTimer);
+            state.typingTimer = setTimeout(async () => {
+                const title = e.target.value.trim();
+                if (!title) return;
+                
+                try {
+                    const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(title)}&srlimit=1&format=json&origin=*`);
+                    const data = await res.json();
+                    const exists = data.query.search && data.query.search.length > 0;
+                    
+                    if (exists) {
+                        const exactTitle = data.query.search[0].title;
+                        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', state.roomId);
+                        
+                        // Visual feedback (Green border)
+                        e.target.classList.remove('border-slate-300', 'border-rose-500', 'ring-rose-500');
+                        e.target.classList.add('border-emerald-500', 'ring-emerald-500');
+                        
+                        if (type === 'start') {
+                            await updateDoc(roomRef, { startArticle: exactTitle });
+                        } else {
+                            await updateDoc(roomRef, { targetArticle: exactTitle });
+                        }
+                    } else {
+                        // Visual feedback (Red border)
+                        e.target.classList.remove('border-slate-300', 'border-emerald-500', 'ring-emerald-500');
+                        e.target.classList.add('border-rose-500', 'ring-rose-500');
+                    }
+                } catch (err) {
+                    console.error("Lobby validation error", err);
+                }
+            }, 600);
+        };
+        
+        DOM.lobby.lobbyStartInput.addEventListener('input', (e) => handleLobbyCustomInput(e, 'start'));
+        DOM.lobby.lobbyTargetInput.addEventListener('input', (e) => handleLobbyCustomInput(e, 'target'));
+
 
         const startTimer = () => {
             if (state.timerInterval) clearInterval(state.timerInterval);
@@ -686,8 +755,6 @@
                 }
             } catch (err) {
                 console.error("Error fetching article:", err);
-                
-                // IF FIRST PAGE FAILS TO LOAD: KICK THEM OUT SO THEY DONT GET STUCK ON A WHITE SCREEN
                 if (state.clicks === 0) {
                      showToast("Starting article failed to load! Returning to lobby...");
                      setTimeout(() => { forceGiveUp(); }, 1500);
@@ -803,10 +870,17 @@
                         DOM.lobby.list.appendChild(li);
                     });
 
-                    // React to Host selecting category (preview)
-                    if (data.startArticle && data.targetArticle && data.startArticle !== 'Loading...') {
-                        DOM.lobby.previewStart.textContent = displayTitle(data.startArticle);
-                        DOM.lobby.previewTarget.textContent = displayTitle(data.targetArticle);
+                    // Update Previews (if custom is selected, don't overwrite the host's inputs!)
+                    if (data.startArticle && data.targetArticle) {
+                        if (!state.isHost || DOM.lobby.catSelect.value !== 'custom') {
+                            DOM.lobby.previewStart.classList.remove('hidden');
+                            DOM.lobby.previewTarget.classList.remove('hidden');
+                            DOM.lobby.previewStartCust.classList.add('hidden');
+                            DOM.lobby.previewTargetCust.classList.add('hidden');
+                            
+                            DOM.lobby.previewStart.textContent = displayTitle(data.startArticle);
+                            DOM.lobby.previewTarget.textContent = displayTitle(data.targetArticle);
+                        }
                     }
                 }
 
@@ -827,7 +901,6 @@
                 // Update In-Game Leaderboard
                 if (state.status === 'playing' || state.status === 'won') {
                     DOM.game.liveList.innerHTML = '';
-                    // Sort: Winners first (by time), then playing (by clicks high to low)
                     const sortedPlayers = Object.values(data.players).sort((a,b) => {
                         if(a.status === 'won' && b.status !== 'won') return -1;
                         if(b.status === 'won' && a.status !== 'won') return 1;
@@ -867,8 +940,14 @@
             state.isHost = true;
             state.mode = 'multi';
             
+            // Reset input visual states incase they were changed
+            DOM.lobby.catSelect.value = 'any';
+            DOM.lobby.lobbyStartInput.value = '';
+            DOM.lobby.lobbyTargetInput.value = '';
+            DOM.lobby.lobbyStartInput.classList.remove('border-emerald-500', 'border-rose-500', 'ring-emerald-500', 'ring-rose-500');
+            DOM.lobby.lobbyTargetInput.classList.remove('border-emerald-500', 'border-rose-500', 'ring-emerald-500', 'ring-rose-500');
+            
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', code);
-            // Create empty room first
             await setDoc(roomRef, {
                 hostId: user.uid,
                 status: 'lobby',
@@ -888,7 +967,6 @@
             updateView();
             subscribeToRoom(code);
 
-            // Now immediately fetch the first preview
             const pairs = await fetchRandomPairs('any');
             if (pairs) {
                 await updateDoc(roomRef, { startArticle: pairs[0], targetArticle: pairs[1] });
@@ -926,13 +1004,14 @@
 
         const startMultiplayerGame = async () => {
             if (!state.isHost) return;
-            if (!state.roomData.startArticle || state.roomData.startArticle === 'Loading...') {
-                return showToast("Please wait for articles to load!");
+            
+            const invalidTexts = ['Loading...', 'Waiting for host to input custom text...', ''];
+            if (invalidTexts.includes(state.roomData.startArticle) || invalidTexts.includes(state.roomData.targetArticle)) {
+                return showToast("Please ensure both articles are valid!");
             }
             
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', state.roomId);
             
-            // Reset all players to playing state
             const resetPlayers = {};
             Object.keys(state.roomData.players).forEach(uid => {
                 resetPlayers[`players.${uid}.status`] = 'playing';
@@ -983,24 +1062,47 @@
         
         DOM.lobby.catSelect.addEventListener('change', async (e) => {
             if (!state.isHost) return;
-            DOM.lobby.previewStart.textContent = "Loading...";
-            DOM.lobby.previewTarget.textContent = "Loading...";
-            const pairs = await fetchRandomPairs(e.target.value);
-            if (pairs) {
+            
+            const val = e.target.value;
+            
+            if (val === 'custom') {
+                DOM.lobby.btnRerollRoute.classList.add('hidden');
+                DOM.lobby.previewStart.classList.add('hidden');
+                DOM.lobby.previewTarget.classList.add('hidden');
+                DOM.lobby.previewStartCust.classList.remove('hidden');
+                DOM.lobby.previewTargetCust.classList.remove('hidden');
+                
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', state.roomId);
-                await updateDoc(roomRef, { startArticle: pairs[0], targetArticle: pairs[1] });
+                await updateDoc(roomRef, { startArticle: 'Waiting for host to input custom text...', targetArticle: 'Waiting for host to input custom text...' });
+            } else {
+                DOM.lobby.btnRerollRoute.classList.remove('hidden');
+                DOM.lobby.previewStart.classList.remove('hidden');
+                DOM.lobby.previewTarget.classList.remove('hidden');
+                DOM.lobby.previewStartCust.classList.add('hidden');
+                DOM.lobby.previewTargetCust.classList.add('hidden');
+                
+                DOM.lobby.previewStart.textContent = "Loading...";
+                DOM.lobby.previewTarget.textContent = "Loading...";
+                const pairs = await fetchRandomPairs(val);
+                if (pairs) {
+                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', state.roomId);
+                    await updateDoc(roomRef, { startArticle: pairs[0], targetArticle: pairs[1] });
+                }
             }
         });
 
         DOM.lobby.btnRerollRoute.addEventListener('click', async () => {
             if (!state.isHost) return;
-            const icon = DOM.lobby.btnRerollRoute.querySelector('i');
-            icon.classList.add('animate-spin');
+            
+            // Fix applied: lucide swapped <i> for <svg>, so we grab svg OR i.
+            const icon = DOM.lobby.btnRerollRoute.querySelector('svg') || DOM.lobby.btnRerollRoute.querySelector('i');
+            if(icon) icon.classList.add('animate-spin');
+            
             DOM.lobby.previewStart.textContent = "Loading...";
             DOM.lobby.previewTarget.textContent = "Loading...";
             
             const pairs = await fetchRandomPairs(DOM.lobby.catSelect.value);
-            icon.classList.remove('animate-spin');
+            if(icon) icon.classList.remove('animate-spin');
             
             if (pairs) {
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', state.roomId);
@@ -1023,11 +1125,9 @@
                 updateView();
                 if (state.category !== 'custom') loadSinglePlayerMenu();
             } else {
-                // Return to lobby
                 DOM.game.contentArea.innerHTML = '';
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', state.roomId);
                 
-                // If host, transition room back to lobby for everyone
                 if (state.isHost) {
                     await updateDoc(roomRef, { status: 'lobby' });
                 } else {
