@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON ROYALE 777 - HIGH ROLLER EDITION v2.0</title>
+<title>NEON ROYALE 777 - v3.6 PORT-443 MULTIPLAYER EDITION</title>
+<!-- Real Multiplayer Networking Libraries (Port 443 Compatible) -->
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/mqtt@5.3.4/dist/mqtt.min.js"></script>
 <style>
   :root {
     --bg: #070312;
@@ -14,6 +17,7 @@
     --gold: #ffd700;
     --green: #00ff88;
     --purple: #9d00ff;
+    --red: #ff1744;
   }
   * { box-sizing: border-box; user-select: none; }
   html, body {
@@ -22,7 +26,7 @@
     overflow: hidden;
     background: radial-gradient(circle at 50% 30%, #261157 0%, var(--bg) 85%);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #fff;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
   body.fever-active {
     background: radial-gradient(circle at 50% 30%, #570c31 0%, #14020c 85%);
@@ -33,21 +37,56 @@
     to { filter: hue-rotate(25deg); }
   }
 
+  /* Live Global Ticker */
+  .global-ticker {
+    width: min(1440px, 97vw);
+    height: 30px;
+    background: rgba(8, 4, 20, 0.92);
+    border: 1px solid #352266;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; overflow: hidden;
+    padding: 0 12px; gap: 10px; flex-shrink: 0;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.14);
+    z-index: 3;
+  }
+  .ticker-badge {
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    color: #fff; font-size: 10px; font-weight: 900;
+    padding: 3px 8px; border-radius: 6px; letter-spacing: 1px; white-space: nowrap;
+  }
+  .ticker-content {
+    font-size: 11.5px; color: #e0d4ff; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+  }
+  .online-pill {
+    font-size: 11px; color: var(--green); font-weight: 800;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .online-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #ff9100;
+    box-shadow: 0 0 8px #ff9100; animation: blink 1.2s infinite alternate;
+  }
+  .online-dot.connected {
+    background: var(--green); box-shadow: 0 0 8px var(--green);
+  }
+  @keyframes blink { from { opacity: 0.4; } to { opacity: 1; } }
+
   .app-layout {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 18px;
-    width: min(1380px, 96vw);
-    height: min(860px, 94vh);
+    grid-template-columns: 1fr 350px;
+    gap: 14px;
+    width: min(1440px, 97vw);
+    height: min(850px, 90vh);
     position: relative; z-index: 2;
   }
 
   /* Main Cabinet */
   .cabinet {
     background: linear-gradient(180deg, var(--panel-light) 0%, var(--panel) 100%);
-    border: 2px solid var(--cyan); border-radius: 24px;
-    padding: 16px 22px;
-    display: flex; flex-direction: column; gap: 10px;
+    border: 2px solid var(--cyan); border-radius: 22px;
+    padding: 14px 18px;
+    display: flex; flex-direction: column; gap: 9px;
     height: 100%; min-height: 0;
     box-shadow: 0 0 40px rgba(0, 243, 255, 0.22), inset 0 0 30px rgba(255, 0, 127, 0.18);
     position: relative; transition: transform 0.08s, border-color 0.3s, box-shadow 0.3s;
@@ -57,6 +96,11 @@
     box-shadow: 0 0 55px rgba(255, 215, 0, 0.45), inset 0 0 35px rgba(255, 0, 127, 0.4);
   }
   .cabinet.shake { animation: cabinetShake 0.25s cubic-bezier(.36,.07,.19,.97) both; }
+  .cabinet.cheat-alert {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 60px rgba(255, 23, 68, 0.9), inset 0 0 40px rgba(255, 23, 68, 0.6) !important;
+    animation: cabinetShake 0.35s infinite;
+  }
   @keyframes cabinetShake {
     10%, 90% { transform: translate3d(-3px, 2px, 0); }
     20%, 80% { transform: translate3d(4px, -2px, 0); }
@@ -66,23 +110,23 @@
 
   /* Top Navigation Bar */
   .top-nav {
-    display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    flex-shrink: 0;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    flex-shrink: 0; flex-wrap: wrap;
   }
   .title {
-    font-size: 22px; font-weight: 900; letter-spacing: 2px; white-space: nowrap;
+    font-size: 18px; font-weight: 900; letter-spacing: 1.5px; white-space: nowrap;
     background: linear-gradient(90deg, var(--gold), #fff, var(--cyan));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     text-shadow: 0 0 18px rgba(255, 0, 127, 0.45);
   }
   .game-tabs {
-    display: flex; gap: 8px; background: #080414; padding: 4px;
+    display: flex; gap: 5px; background: #080414; padding: 4px;
     border-radius: 12px; border: 1px solid #2b1d52;
   }
   .tab-btn {
     background: transparent; border: none; color: #8c7db0; font-weight: 900;
-    font-size: 13px; padding: 7px 18px; border-radius: 9px; cursor: pointer;
-    letter-spacing: 1px; transition: all 0.2s; white-space: nowrap;
+    font-size: 11.5px; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    letter-spacing: 0.6px; transition: all 0.2s; white-space: nowrap;
   }
   .tab-btn:hover { color: #fff; }
   .tab-btn.active {
@@ -90,60 +134,72 @@
     color: #fff; box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
   }
   .header-right {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 6px;
   }
-  .btn-changelog-top {
-    background: #1c103b; border: 1px solid var(--cyan); color: var(--cyan);
-    font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 14px;
-    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  .user-pill-btn {
+    background: #190e36; border: 1px solid var(--cyan); color: #fff;
+    font-size: 11px; font-weight: 900; padding: 5px 10px; border-radius: 12px;
+    cursor: pointer; display: flex; align-items: center; gap: 5px;
+    transition: all 0.15s; box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
   }
-  .btn-changelog-top:hover { background: var(--cyan); color: #000; box-shadow: 0 0 12px var(--cyan); }
+  .user-pill-btn:hover { background: var(--cyan); color: #000; }
+  .shield-badge {
+    background: rgba(0, 255, 136, 0.14); border: 1px solid var(--green);
+    color: var(--green); font-size: 10.5px; font-weight: 900;
+    padding: 5px 9px; border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 4px; transition: all 0.15s;
+  }
+  .shield-badge:hover { background: var(--green); color: #000; }
+  .shield-badge.compromised {
+    background: rgba(255, 23, 68, 0.2); border-color: var(--red); color: var(--red);
+    box-shadow: 0 0 14px var(--red);
+  }
   .vip-badge {
     background: linear-gradient(135deg, #ffd700, #ff8800); color: #000;
-    font-weight: 900; font-size: 11px; padding: 6px 12px; border-radius: 14px;
-    letter-spacing: 0.8px; box-shadow: 0 0 12px var(--gold); white-space: nowrap;
+    font-weight: 900; font-size: 10.5px; padding: 5px 10px; border-radius: 12px;
+    letter-spacing: 0.6px; box-shadow: 0 0 12px var(--gold); white-space: nowrap;
   }
 
   /* Unified 4-Card HUD Dashboard */
   .dashboard {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; flex-shrink: 0;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex-shrink: 0;
   }
   .stat-card {
-    background: #080414; border: 1px solid #2b1d52; border-radius: 12px;
-    padding: 7px 12px; text-align: center;
+    background: #080414; border: 1px solid #2b1d52; border-radius: 11px;
+    padding: 6px 10px; text-align: center;
   }
   .stat-card.jackpot-card {
     background: linear-gradient(135deg, #1f073b, #3d0b40);
     border-color: var(--gold);
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
   }
-  .stat-title { font-size: 10px; color: #9c8ec0; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
-  .stat-value { font-size: 20px; font-weight: 900; color: #fff; margin-top: 2px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat-title { font-size: 9.5px; color: #9c8ec0; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+  .stat-value { font-size: 19px; font-weight: 900; color: #fff; margin-top: 2px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stat-value.cyan { color: var(--cyan); }
   .stat-value.gold { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.45); transition: transform 0.2s; }
 
-  /* Center Game Stage (Maximized space for Slots & Plinko) */
-  #slotsView, #plinkoView {
-    flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px;
+  /* Center Game Stages */
+  #slotsView, #plinkoView, #rouletteView, #battleView {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px;
   }
-  #plinkoView { display: none; }
+  #plinkoView, #rouletteView, #battleView { display: none; }
 
-  /* 3x3 Slot Grid - Oversized Symbols & Breathing Room */
+  /* 3x3 Slot Grid */
   .slot-frame {
     flex: 1; min-height: 0;
-    position: relative; background: #05020a; padding: 14px 18px;
-    border-radius: 18px; border: 2px solid var(--accent);
+    position: relative; background: #05020a; padding: 12px 16px;
+    border-radius: 16px; border: 2px solid var(--accent);
     box-shadow: inset 0 12px 35px #000, 0 0 20px rgba(255, 0, 127, 0.22);
     display: flex; flex-direction: column;
   }
   .reels-grid {
     flex: 1; min-height: 0;
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; position: relative;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; position: relative;
   }
   .reel-col {
-    display: grid; grid-template-rows: repeat(3, 1fr); gap: 10px;
+    display: grid; grid-template-rows: repeat(3, 1fr); gap: 8px;
     background: linear-gradient(180deg, #0b061a 0%, #1c113d 50%, #0b061a 100%);
-    border-radius: 14px; padding: 10px; border: 2px solid #2e1d59;
+    border-radius: 12px; padding: 8px; border: 2px solid #2e1d59;
     position: relative; transition: border-color 0.2s, box-shadow 0.2s;
     min-height: 0;
   }
@@ -159,11 +215,10 @@
   @keyframes teasePulse { from { filter: brightness(1); } to { filter: brightness(1.4); } }
 
   .cell {
-    background: rgba(8, 4, 20, 0.7); border-radius: 12px;
+    background: rgba(8, 4, 20, 0.7); border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: clamp(44px, 7.5vh, 72px);
-    line-height: 1;
-    position: relative;
+    font-size: clamp(38px, 6.8vh, 66px);
+    line-height: 1; position: relative;
     border: 1px solid rgba(255,255,255,0.06);
     transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
     min-height: 0;
@@ -182,22 +237,21 @@
     z-index: 3;
   }
   @keyframes cellBlur {
-    0% { transform: translateY(-16px) scaleY(1.12); }
-    100% { transform: translateY(16px) scaleY(1.12); }
+    0% { transform: translateY(-14px) scaleY(1.12); }
+    100% { transform: translateY(14px) scaleY(1.12); }
   }
   @keyframes cellBounce {
-    0% { transform: translateY(-20px); }
-    65% { transform: translateY(6px); }
+    0% { transform: translateY(-18px); }
+    65% { transform: translateY(5px); }
     100% { transform: translateY(0); }
   }
   @keyframes winPop {
     from { transform: scale(1); }
-    to { transform: scale(1.08); }
+    to { transform: scale(1.07); }
   }
 
-  /* SVG Paylines Overlay */
   .payline-svg {
-    position: absolute; inset: 14px 18px; width: calc(100% - 36px); height: calc(100% - 28px);
+    position: absolute; inset: 12px 16px; width: calc(100% - 32px); height: calc(100% - 24px);
     pointer-events: none; z-index: 5;
   }
   .payline-path {
@@ -210,13 +264,12 @@
   }
   @keyframes lineFlash { from { stroke-width: 5; } to { stroke-width: 9; } }
 
-  /* Hold Buttons Row */
   .hold-row {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex-shrink: 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex-shrink: 0;
   }
   .btn-hold {
     background: #1a1036; border: 1px solid #412a7a; color: #a796d1;
-    padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 800;
+    padding: 7px; border-radius: 9px; font-size: 11.5px; font-weight: 800;
     cursor: pointer; transition: all 0.15s;
   }
   .btn-hold:hover:not(:disabled) { border-color: var(--cyan); color: #fff; }
@@ -226,64 +279,227 @@
   }
   .btn-hold:disabled { opacity: 0.35; cursor: not-allowed; }
 
-  /* Plinko View - Large High-Res Board */
+  /* Plinko View */
   .plinko-frame {
     flex: 1; min-height: 0;
-    background: #05020a; border-radius: 18px; border: 2px solid var(--cyan);
+    background: #05020a; border-radius: 16px; border: 2px solid var(--cyan);
     box-shadow: inset 0 12px 35px #000, 0 0 20px rgba(0, 243, 255, 0.22);
-    padding: 10px; position: relative; display: flex; align-items: center; justify-content: center;
+    padding: 8px; position: relative; display: flex; align-items: center; justify-content: center;
   }
   #plinkoCanvas {
     width: 100%; height: 100%; object-fit: contain; display: block; z-index: 2;
   }
   .plinko-controls {
     display: flex; justify-content: space-between; align-items: center;
-    background: #0b051c; padding: 7px 14px; border-radius: 11px;
-    border: 1px solid #2b1d52; gap: 12px; flex-shrink: 0;
+    background: #0b051c; padding: 6px 12px; border-radius: 10px;
+    border: 1px solid #2b1d52; gap: 10px; flex-shrink: 0;
   }
   .risk-group { display: flex; gap: 8px; flex: 1; }
   .btn-risk {
     flex: 1; background: #1a1036; border: 1px solid #412a7a; color: #a796d1;
-    padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 900; cursor: pointer;
+    padding: 6px 10px; border-radius: 8px; font-size: 11.5px; font-weight: 900; cursor: pointer;
     transition: all 0.15s;
   }
   .btn-risk.active.low { background: #00c853; color: #000; border-color: #fff; box-shadow: 0 0 10px #00c853; }
   .btn-risk.active.med { background: #ffab00; color: #000; border-color: #fff; box-shadow: 0 0 10px #ffab00; }
   .btn-risk.active.high { background: #ff0055; color: #fff; border-color: #fff; box-shadow: 0 0 12px #ff0055; }
 
+  /* VIEW 3: NEON ROULETTE */
+  .roulette-stage {
+    flex: 1; min-height: 0;
+    background: #05020a; border-radius: 16px; border: 2px solid var(--gold);
+    box-shadow: inset 0 12px 35px #000, 0 0 20px rgba(255, 215, 0, 0.2);
+    padding: 10px 14px;
+    display: grid; grid-template-columns: 270px 1fr; gap: 14px; align-items: center;
+  }
+  .wheel-box {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; position: relative; gap: 6px;
+  }
+  #rouletteCanvas {
+    width: 245px; height: 245px; object-fit: contain;
+    filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.25));
+  }
+  .roulette-history {
+    display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;
+  }
+  .hist-ball {
+    width: 24px; height: 24px; border-radius: 50%; font-size: 10px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  .hist-ball.red { background: #d50000; color: #fff; }
+  .hist-ball.black { background: #212121; color: #fff; }
+  .hist-ball.green { background: #00c853; color: #000; }
+
+  .roulette-board-wrap {
+    display: flex; flex-direction: column; gap: 7px; height: 100%; justify-content: center;
+  }
+  .roulette-grid {
+    display: grid;
+    grid-template-columns: 42px repeat(12, 1fr);
+    grid-template-rows: repeat(3, 42px);
+    gap: 4px;
+  }
+  .r-cell {
+    border-radius: 6px; font-weight: 900; font-size: 13px; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; border: 1px solid rgba(255,255,255,0.18);
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .r-cell:hover { transform: scale(1.05); border-color: var(--cyan); z-index: 2; }
+  .r-cell.zero { grid-row: 1 / span 3; background: linear-gradient(180deg, #00c853, #00701a); font-size: 16px; }
+  .r-cell.red { background: linear-gradient(135deg, #e53935, #9f0000); }
+  .r-cell.black { background: linear-gradient(135deg, #263238, #0d1317); }
+  .r-cell.winner-glow {
+    border: 2px solid var(--gold) !important;
+    box-shadow: 0 0 22px var(--gold) !important;
+    animation: winPop 0.4s infinite alternate;
+  }
+  .r-outside-row { display: grid; gap: 5px; }
+  .r-outside-row.dozens { grid-template-columns: 42px repeat(3, 1fr); }
+  .r-outside-row.even-money { grid-template-columns: 42px repeat(6, 1fr); }
+  .r-out-btn {
+    background: #150b2e; border: 1px solid #3c2875; border-radius: 6px;
+    padding: 7px 4px; font-size: 11px; font-weight: 900; color: #e2d9ff;
+    cursor: pointer; text-align: center; position: relative; transition: all 0.15s;
+  }
+  .r-out-btn:hover { border-color: var(--cyan); color: #fff; }
+  .r-out-btn.red-out { background: linear-gradient(90deg, #b71c1c, #d32f2f); }
+  .r-out-btn.black-out { background: linear-gradient(90deg, #1c262b, #37474f); }
+
+  .chip-marker {
+    position: absolute; top: -6px; right: -5px;
+    background: radial-gradient(circle, var(--gold), #ff8800);
+    color: #000; font-size: 9.5px; font-weight: 900;
+    padding: 2px 5px; border-radius: 10px; border: 1.5px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.8); pointer-events: none; z-index: 4;
+  }
+  .roulette-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #0b051c; padding: 6px 12px; border-radius: 9px; border: 1px solid #2b1d52;
+  }
+
+  /* VIEW 4: REAL MULTIPLAYER 10-SPIN SLOT BATTLES */
+  .battle-stage {
+    flex: 1; min-height: 0;
+    background: #05020a; border-radius: 16px; border: 2px solid var(--purple);
+    box-shadow: inset 0 12px 35px #000, 0 0 25px rgba(157, 0, 255, 0.28);
+    padding: 10px 14px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .battle-top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #0e0624; padding: 8px 12px; border-radius: 10px; border: 1px solid #3c2875;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .room-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .room-input {
+    background: #1a0f3b; border: 1px solid var(--cyan); color: #fff;
+    padding: 6px 10px; border-radius: 7px; font-size: 12px; font-weight: 900; width: 110px;
+    text-transform: uppercase; user-select: text;
+  }
+  .btn-mp {
+    background: linear-gradient(135deg, var(--cyan), #0077ff);
+    border: none; color: #000; font-weight: 900; font-size: 11px;
+    padding: 6px 11px; border-radius: 7px; cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-mp.purple { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; }
+  .btn-mp.gold { background: linear-gradient(135deg, var(--gold), #ff8800); color: #000; }
+  .btn-mp.green { background: linear-gradient(135deg, #00e676, #00bfa5); color: #000; }
+  .btn-mp:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-mp:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .battle-hud-strip {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(90deg, #1b0a3a, #2c0b45, #1b0a3a);
+    padding: 6px 14px; border-radius: 9px; border: 1px solid var(--gold);
+    font-size: 11.5px; font-weight: 900; flex-wrap: wrap; gap: 8px;
+  }
+  .battle-players-grid {
+    flex: 1; min-height: 0;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .mp-card {
+    background: linear-gradient(180deg, #120829 0%, #090414 100%);
+    border: 2px solid #2e1d59; border-radius: 12px; padding: 8px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; transition: all 0.2s;
+  }
+  .mp-card.empty-seat {
+    border-style: dashed; border-color: #38246b; opacity: 0.65;
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .mp-card.leader {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.35);
+  }
+  .mp-card.you { border-color: var(--cyan); }
+  .mp-header {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; font-weight: 900; border-bottom: 1px solid #26174a; padding-bottom: 4px;
+  }
+  .mp-mini-reels {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+    background: #04010a; padding: 6px; border-radius: 8px; border: 1px solid #321f61;
+    margin: 4px 0; flex: 1; align-items: center;
+  }
+  .mp-mini-cell {
+    background: #120926; border-radius: 6px; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(20px, 3.2vh, 30px);
+  }
+  .mp-stats { font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
+  .mp-profit {
+    font-size: 13.5px; font-weight: 900; text-align: center;
+    padding: 3px; border-radius: 6px; background: #0c051c;
+  }
+  .mp-profit.pos { color: var(--green); }
+  .mp-profit.neg { color: #ff5252; }
+
+  .taunt-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #0b051c; padding: 5px 10px; border-radius: 8px; border: 1px solid #2b1d52;
+    gap: 8px;
+  }
+  .emoji-btns { display: flex; gap: 5px; }
+  .btn-emoji {
+    background: #1a0f3b; border: 1px solid #3c2875; border-radius: 6px;
+    font-size: 14px; padding: 3px 8px; cursor: pointer; transition: transform 0.1s;
+  }
+  .btn-emoji:hover { transform: scale(1.2); border-color: var(--cyan); }
+
   /* Single-Row Uncapped Custom Betting Bar */
   .bet-section {
-    background: #090414; padding: 8px 12px; border-radius: 12px; border: 1px solid #261947;
-    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    background: #090414; padding: 7px 12px; border-radius: 11px; border: 1px solid #261947;
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
   }
   .bet-label {
     font-size: 11px; font-weight: 900; color: var(--cyan); letter-spacing: 1px; white-space: nowrap;
   }
   .bet-input-wrap {
     display: flex; align-items: center; background: #140a2e;
-    border: 2px solid #3c2875; border-radius: 9px; padding: 5px 10px; width: 170px;
+    border: 2px solid #3c2875; border-radius: 8px; padding: 4px 8px; width: 155px;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .bet-input-wrap:focus-within {
     border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
   }
   .currency-prefix {
-    color: var(--gold); font-weight: 900; font-size: 15px; margin-right: 4px;
+    color: var(--gold); font-weight: 900; font-size: 14px; margin-right: 4px;
   }
   .bet-input {
     width: 100%; background: transparent; border: none; color: #fff;
-    font-size: 15px; font-weight: 900; outline: none; font-family: inherit;
+    font-size: 14px; font-weight: 900; outline: none; font-family: inherit;
     user-select: text;
   }
   .bet-input::-webkit-outer-spin-button,
   .bet-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-  .bet-bar {
-    display: flex; gap: 6px; flex: 1;
-  }
+  .bet-bar { display: flex; gap: 5px; flex: 1; }
   .btn-mod {
     background: #1e133d; border: 1px solid #3c2875; color: var(--cyan);
-    padding: 8px 8px; border-radius: 8px; font-size: 11px; font-weight: 800;
+    padding: 7px 6px; border-radius: 7px; font-size: 10.5px; font-weight: 800;
     cursor: pointer; flex: 1; transition: all 0.15s; white-space: nowrap;
   }
   .btn-mod:hover:not(:disabled) { background: #2c1c59; border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,243,255,0.3); }
@@ -296,8 +512,8 @@
   }
   .btn-spin {
     flex: 2; background: linear-gradient(135deg, var(--accent), #ff5100);
-    border: none; border-radius: 13px; padding: 13px;
-    font-size: 19px; font-weight: 900; color: #fff; letter-spacing: 2px;
+    border: none; border-radius: 12px; padding: 11px;
+    font-size: 17px; font-weight: 900; color: #fff; letter-spacing: 1.8px;
     cursor: pointer; box-shadow: 0 0 22px rgba(255, 0, 127, 0.5);
     text-shadow: 0 2px 4px rgba(0,0,0,0.4); transition: all 0.15s;
   }
@@ -307,57 +523,110 @@
 
   .btn-gamble {
     flex: 1; background: linear-gradient(135deg, #00c853, #009624);
-    border: 2px solid #69f0ae; border-radius: 13px; color: #fff;
-    font-weight: 900; font-size: 14px; cursor: pointer; display: none;
+    border: 2px solid #69f0ae; border-radius: 12px; color: #fff;
+    font-weight: 900; font-size: 13px; cursor: pointer; display: none;
     animation: pulseGamble 0.6s infinite alternate;
   }
   @keyframes pulseGamble { from { box-shadow: 0 0 8px #00e676; } to { box-shadow: 0 0 22px #00e676; transform: scale(1.02); } }
 
   .btn-auto {
-    background: #1d123b; border: 2px solid var(--cyan); border-radius: 13px;
-    color: var(--cyan); font-weight: 900; padding: 0 22px; font-size: 13px; cursor: pointer;
+    background: #1d123b; border: 2px solid var(--cyan); border-radius: 12px;
+    color: var(--cyan); font-weight: 900; padding: 0 20px; font-size: 12.5px; cursor: pointer;
   }
   .btn-auto.active { background: var(--cyan); color: #000; box-shadow: 0 0 16px var(--cyan); }
 
   .status-msg {
-    min-height: 20px; text-align: center; flex-shrink: 0;
-    font-weight: 800; font-size: 13px; color: var(--gold);
+    min-height: 18px; text-align: center; flex-shrink: 0;
+    font-weight: 800; font-size: 12.5px; color: var(--gold);
     letter-spacing: 0.4px; text-shadow: 0 0 8px rgba(255,215,0,0.3);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
-  /* Side Panel - Clean & Uncluttered */
+  /* Side Panel - Tabbed Real Online Hub & Paytable */
   .side-panel {
-    background: var(--panel); border: 2px solid #352266; border-radius: 24px;
-    padding: 16px; height: 100%; min-height: 0;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+    background: var(--panel); border: 2px solid #352266; border-radius: 22px;
+    padding: 14px; height: 100%; min-height: 0;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
   }
-  .panel-title {
-    font-size: 13px; font-weight: 900; color: var(--cyan);
-    letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 8px;
-    border-bottom: 1px solid #2e1d59; padding-bottom: 5px;
+  .side-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+    background: #080414; padding: 4px; border-radius: 10px; border: 1px solid #2b1d52;
+    flex-shrink: 0;
   }
-  .payout-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  .side-tab-btn {
+    background: transparent; border: none; color: #9c8ec0; font-size: 11px;
+    font-weight: 900; padding: 6px 4px; border-radius: 7px; cursor: pointer;
+    transition: all 0.15s;
   }
+  .side-tab-btn.active {
+    background: linear-gradient(135deg, var(--cyan), #0077ff); color: #000;
+  }
+  .side-tab-pane {
+    flex: 1; min-height: 0; display: none; flex-direction: column; gap: 8px; overflow: hidden;
+  }
+  .side-tab-pane.active { display: flex; }
+
+  /* Real Leaderboard Styles */
+  .profile-bar {
+    display: flex; justify-content: space-between; align-items: center; background: #090414;
+    padding: 7px 10px; border-radius: 9px; border: 1px solid #2b1d52; font-size: 11.5px;
+  }
+  .lb-list {
+    flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 5px;
+    padding-right: 3px;
+  }
+  .lb-row {
+    background: #0b0618; border: 1px solid #221544; border-radius: 8px;
+    padding: 7px 9px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 11.5px;
+  }
+  .lb-row.you {
+    border-color: var(--cyan); background: rgba(0, 243, 255, 0.08);
+  }
+  .lb-rank { font-weight: 900; width: 24px; color: var(--gold); }
+  .lb-name { font-weight: 800; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lb-val { font-weight: 900; color: var(--green); font-variant-numeric: tabular-nums; }
+
+  /* Real Chat & Rain Styles */
+  .chat-messages {
+    flex: 1; min-height: 0; overflow-y: auto; background: #070312;
+    border: 1px solid #26184a; border-radius: 10px; padding: 8px;
+    display: flex; flex-direction: column; gap: 6px; font-size: 11.5px;
+  }
+  .chat-line { line-height: 1.35; word-break: break-word; }
+  .chat-line b { color: var(--cyan); }
+  .chat-line.sys { color: var(--gold); font-weight: 800; }
+  .chat-input-row { display: flex; gap: 5px; }
+  .chat-input {
+    flex: 1; background: #140a2e; border: 1px solid #3c2875; color: #fff;
+    padding: 6px 9px; border-radius: 7px; font-size: 11.5px; user-select: text;
+  }
+  .rain-btn {
+    background: linear-gradient(90deg, #00e676, #00b0ff); border: none;
+    color: #000; font-weight: 900; font-size: 11px; padding: 8px;
+    border-radius: 8px; cursor: pointer; box-shadow: 0 0 12px rgba(0, 230, 118, 0.35);
+  }
+
+  .payout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
   .payout-card {
-    background: #0b0618; padding: 8px 10px; border-radius: 9px; border: 1px solid #211442;
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: #0b0618; padding: 6px 8px; border-radius: 8px; border: 1px solid #211442;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
   }
   .payout-card.wide { grid-column: span 2; flex-direction: row; justify-content: space-between; }
-  .payout-sym { font-size: 18px; letter-spacing: 1px; }
-  .payout-mult { font-size: 12px; font-weight: 900; color: var(--gold); }
+  .payout-sym { font-size: 16px; letter-spacing: 1px; }
+  .payout-mult { font-size: 11px; font-weight: 900; color: var(--gold); }
 
   .fever-box {
-    background: #090414; border-radius: 12px; padding: 10px 12px;
-    border: 1px solid #352266; display: flex; flex-direction: column; gap: 6px;
+    background: #090414; border-radius: 10px; padding: 8px 10px;
+    border: 1px solid #352266; display: flex; flex-direction: column; gap: 5px;
+    flex-shrink: 0;
   }
   .fever-header {
     display: flex; justify-content: space-between; align-items: center;
-    font-size: 11px; font-weight: 900; color: var(--accent); letter-spacing: 0.8px;
+    font-size: 10.5px; font-weight: 900; color: var(--accent); letter-spacing: 0.8px;
   }
-  .fever-track { height: 10px; background: #160d2e; border-radius: 6px; overflow: hidden; }
+  .fever-track { height: 8px; background: #160d2e; border-radius: 5px; overflow: hidden; }
   .fever-fill {
     height: 100%; width: 0%;
     background: linear-gradient(90deg, var(--cyan), var(--accent), var(--gold));
@@ -365,43 +634,39 @@
   }
 
   .stats-mini {
-    background: #090414; padding: 10px 12px; border-radius: 12px;
-    border: 1px solid #241645; font-size: 12px; display: flex; flex-direction: column; gap: 6px;
+    background: #090414; padding: 8px 10px; border-radius: 10px;
+    border: 1px solid #241645; font-size: 11px; display: flex; flex-direction: column; gap: 4px;
   }
   .stats-mini div { display: flex; justify-content: space-between; color: #a796d1; }
   .stats-mini span.val { color: #fff; font-weight: 800; }
 
-  .save-footer {
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .save-status {
-    font-size: 11px; color: var(--green); text-align: center; font-weight: 700;
-  }
+  .save-footer { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+  .save-status { font-size: 10.5px; color: var(--green); text-align: center; font-weight: 700; }
   .bailout-btn {
     width: 100%; background: linear-gradient(90deg, #ff5100, #ff007f);
-    border: 1px solid var(--gold); color: #fff; padding: 9px;
-    border-radius: 9px; font-weight: 900; cursor: pointer; font-size: 12px;
+    border: 1px solid var(--gold); color: #fff; padding: 8px;
+    border-radius: 8px; font-weight: 900; cursor: pointer; font-size: 11.5px;
     display: none; box-shadow: 0 0 14px rgba(255, 0, 127, 0.5);
   }
-  .footer-btns { display: flex; gap: 8px; }
+  .footer-btns { display: flex; gap: 6px; }
   .reset-btn, .changelog-side-btn {
     flex: 1; background: #140b29; border: 1px solid #3c2875; color: #a796d1;
-    padding: 8px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 11px;
+    padding: 7px; border-radius: 7px; font-weight: 700; cursor: pointer; font-size: 10.5px;
     transition: all 0.15s;
   }
   .changelog-side-btn:hover { border-color: var(--cyan); color: var(--cyan); }
   .reset-btn:hover { border-color: #ff3366; color: #ff3366; }
 
-  /* Modals (Gamble & Changelog) */
+  /* Modals */
   .modal-backdrop {
-    position: fixed; inset: 0; background: rgba(4, 1, 10, 0.85);
+    position: fixed; inset: 0; background: rgba(4, 1, 10, 0.86);
     backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 30;
     padding: 15px;
   }
   .modal-backdrop.open { display: flex; }
   .gamble-box, .changelog-box {
     background: var(--panel); border: 3px solid var(--gold); border-radius: 20px;
-    padding: 22px; width: 420px; max-width: 100%; text-align: center;
+    padding: 20px; width: 460px; max-width: 100%; text-align: center;
     box-shadow: 0 0 50px rgba(255, 215, 0, 0.4);
   }
   .changelog-box {
@@ -409,40 +674,57 @@
     box-shadow: 0 0 50px rgba(0, 243, 255, 0.35);
   }
   .changelog-title {
-    margin: 0 0 5px 0; font-size: 20px; font-weight: 900;
+    margin: 0 0 5px 0; font-size: 19px; font-weight: 900;
     background: linear-gradient(90deg, var(--cyan), var(--gold));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .changelog-sub {
-    font-size: 12px; color: #a796d1; margin-bottom: 12px;
-  }
+  .changelog-sub { font-size: 11.5px; color: #a796d1; margin-bottom: 10px; }
   .changelog-list {
     background: #090414; border: 1px solid #2b1d52; border-radius: 12px;
-    padding: 12px 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 9px;
-    font-size: 12.5px; color: #e2d9ff; line-height: 1.45;
+    padding: 11px 13px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;
+    font-size: 12px; color: #e2d9ff; line-height: 1.4;
   }
   .changelog-item b { color: var(--gold); }
   .playing-card {
-    width: 105px; height: 145px; margin: 12px auto; border-radius: 12px;
+    width: 100px; height: 140px; margin: 10px auto; border-radius: 12px;
     background: #fff; color: #111; display: flex; align-items: center; justify-content: center;
-    font-size: 52px; font-weight: 900; border: 4px solid var(--cyan);
+    font-size: 50px; font-weight: 900; border: 4px solid var(--cyan);
     box-shadow: 0 10px 25px rgba(0,0,0,0.6); transition: transform 0.25s;
   }
   .gamble-btns { display: flex; gap: 10px; margin-bottom: 10px; }
   .btn-red, .btn-black {
-    flex: 1; padding: 11px; border: none; border-radius: 9px; font-weight: 900; font-size: 14px; cursor: pointer; color: #fff;
+    flex: 1; padding: 10px; border: none; border-radius: 9px; font-weight: 900; font-size: 13px; cursor: pointer; color: #fff;
   }
   .btn-red { background: #e53935; box-shadow: 0 0 15px rgba(229, 57, 53, 0.5); }
   .btn-black { background: #263238; border: 1px solid #90a4ae; }
   .btn-collect {
-    width: 100%; padding: 11px; background: linear-gradient(90deg, var(--gold), #ff9900); color: #000;
-    border: none; border-radius: 9px; font-weight: 900; font-size: 14px; cursor: pointer;
+    width: 100%; padding: 10px; background: linear-gradient(90deg, var(--gold), #ff9900); color: #000;
+    border: none; border-radius: 9px; font-weight: 900; font-size: 13.5px; cursor: pointer;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  }
+
+  /* Username & Avatar Picker Modal */
+  .avatar-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 10px 0 14px 0;
+  }
+  .avatar-option {
+    background: #140a2e; border: 2px solid #3c2875; border-radius: 10px;
+    font-size: 24px; padding: 8px; text-align: center; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .avatar-option.selected {
+    border-color: var(--gold); background: rgba(255, 215, 0, 0.18);
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.4); transform: scale(1.06);
+  }
+  .username-modal-input {
+    width: 100%; background: #090414; border: 2px solid var(--cyan); color: #fff;
+    padding: 10px 12px; border-radius: 10px; font-size: 16px; font-weight: 900;
+    outline: none; user-select: text; margin-bottom: 6px;
   }
 
   /* Floating Text & FX Canvas */
   .float-win {
-    position: fixed; pointer-events: none; font-size: 38px; font-weight: 900;
+    position: fixed; pointer-events: none; font-size: 34px; font-weight: 900;
     color: var(--gold); text-shadow: 0 0 20px #ff007f, 0 4px 8px #000;
     z-index: 25; animation: floatUp 1.3s ease-out forwards;
   }
@@ -458,6 +740,16 @@
 
 <canvas id="fxCanvas"></canvas>
 
+<!-- LIVE REAL-TIME GLOBAL BROADCAST TICKER -->
+<div class="global-ticker">
+  <span class="ticker-badge">🌍 PORT-443 LIVE FEED</span>
+  <div class="ticker-content" id="liveTickerText">Connecting via Port 443 School-Friendly Multiplayer Relay...</div>
+  <div class="online-pill">
+    <span class="online-dot" id="netStatusDot"></span>
+    <span id="onlineCountText">Connecting...</span>
+  </div>
+</div>
+
 <div class="app-layout">
   <!-- MAIN CABINET -->
   <div class="cabinet" id="cabinet">
@@ -465,10 +757,17 @@
       <div class="title">NEON ROYALE 777</div>
       <div class="game-tabs">
         <button class="tab-btn active" id="tabSlots">🎰 777 SLOTS</button>
-        <button class="tab-btn" id="tabPlinko">🟣 NEON PLINKO</button>
+        <button class="tab-btn" id="tabPlinko">🟣 PLINKO</button>
+        <button class="tab-btn" id="tabRoulette">🎡 ROULETTE</button>
+        <button class="tab-btn" id="tabBattle">⚔️ MP SLOT BATTLE</button>
       </div>
       <div class="header-right">
-        <button class="btn-changelog-top" id="openChangelogTop">📜 v2.0 NOTES</button>
+        <button class="user-pill-btn" id="openProfileBtn" title="Change Username & Avatar">
+          <span id="topUserAvatar">😎</span>
+          <span id="topUserName">Player</span>
+          <span style="font-size:9px; color:var(--cyan);">✏️</span>
+        </button>
+        <button class="shield-badge" id="openAnticheatBtn" title="Aegis Vault Anticheat Audit">🛡️ AEGIS</button>
         <div class="vip-badge" id="vipBadge">VIP TIER I</div>
       </div>
     </div>
@@ -476,7 +775,7 @@
     <!-- UNIFIED 4-STAT DASHBOARD -->
     <div class="dashboard">
       <div class="stat-card">
-        <div class="stat-title">Bankroll</div>
+        <div class="stat-title">Protected Bankroll</div>
         <div class="stat-value cyan">$<span id="balanceDisplay">5,000</span></div>
       </div>
       <div class="stat-card">
@@ -545,9 +844,79 @@
       </div>
     </div>
 
+    <!-- VIEW 3: NEON EUROPEAN ROULETTE -->
+    <div id="rouletteView">
+      <div class="roulette-stage">
+        <div class="wheel-box">
+          <canvas id="rouletteCanvas" width="280" height="280"></canvas>
+          <div class="roulette-history" id="rouletteHistory"></div>
+        </div>
+        <div class="roulette-board-wrap">
+          <div class="roulette-grid" id="rouletteGrid"></div>
+          <div class="r-outside-row dozens">
+            <div></div>
+            <div class="r-out-btn" data-bet="d1">1st 12 (3x)</div>
+            <div class="r-out-btn" data-bet="d2">2nd 12 (3x)</div>
+            <div class="r-out-btn" data-bet="d3">3rd 12 (3x)</div>
+          </div>
+          <div class="r-outside-row even-money">
+            <div></div>
+            <div class="r-out-btn" data-bet="low">1-18 (2x)</div>
+            <div class="r-out-btn" data-bet="even">EVEN (2x)</div>
+            <div class="r-out-btn red-out" data-bet="red">♦️ RED (2x)</div>
+            <div class="r-out-btn black-out" data-bet="black">♠️ BLACK (2x)</div>
+            <div class="r-out-btn" data-bet="odd">ODD (2x)</div>
+            <div class="r-out-btn" data-bet="high">19-36 (2x)</div>
+          </div>
+          <div class="roulette-toolbar">
+            <span style="font-size:11.5px; font-weight:900; color:var(--gold);">TABLE BET: $<span id="rouletteTotalBet">0</span></span>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-mp" id="rebetRouletteBtn">🔄 REBET</button>
+              <button class="btn-mp purple" id="clearRouletteBtn">🗑️ CLEAR BETS</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: REAL ONLINE MULTIPLAYER 10-SPIN SLOT BATTLES -->
+    <div id="battleView">
+      <div class="battle-stage">
+        <div class="battle-top-bar">
+          <div class="room-controls">
+            <span style="font-size:11px; font-weight:900; color:var(--cyan);">ROOM CODE:</span>
+            <input type="text" id="roomCodeInput" class="room-input" value="VIP777" maxlength="10" />
+            <button class="btn-mp green" id="hostRoomBtn">👑 HOST ROOM</button>
+            <button class="btn-mp" id="joinRoomBtn">🔗 JOIN ROOM</button>
+            <button class="btn-mp purple" id="addBotBtn" title="Optional: Add an AI bot if waiting for human players">🤖 +AI BOT</button>
+          </div>
+          <button class="btn-mp gold" id="startBattleBtn">⚔️ START 10-SPIN BATTLE!</button>
+        </div>
+
+        <div class="battle-hud-strip">
+          <span>STATUS: <b style="color:var(--cyan);" id="battleRoundText">LOBBY • ROOM VIP777</b></span>
+          <span>STAKE PER SPIN: <b style="color:#fff;">$<span id="battleSpinStakeText">50</span></b> (10x = $<span id="battleBuyInText">500</span>)</span>
+          <span>🏆 LIVE POT: <b style="color:var(--gold); font-size:14px;">$<span id="battlePotText">500</span></b></span>
+        </div>
+
+        <div class="battle-players-grid" id="battlePlayersGrid"></div>
+
+        <div class="taunt-bar">
+          <span style="font-size:11px; color:#a796d1; font-weight:800;">⚡ Works on School Wi-Fi via Port 443 WebRTC! Highest 10-Spin Profit wins the Pot:</span>
+          <div class="emoji-btns">
+            <button class="btn-emoji" data-emo="🔥">🔥</button>
+            <button class="btn-emoji" data-emo="💎">💎</button>
+            <button class="btn-emoji" data-emo="😂">😂</button>
+            <button class="btn-emoji" data-emo="👑">👑</button>
+            <button class="btn-emoji" data-emo="💀">💀</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- SINGLE-ROW UNCAPPED CUSTOM BETTING BAR -->
     <div class="bet-section">
-      <span class="bet-label">BET:</span>
+      <span class="bet-label" id="betBarLabel">BET / CHIP:</span>
       <div class="bet-input-wrap" title="Type any custom bet amount (Uncapped)">
         <span class="currency-prefix">$</span>
         <input type="number" id="customBetInput" class="bet-input" min="1" step="1" value="50" />
@@ -569,13 +938,38 @@
       <button class="btn-auto" id="autoBtn">AUTO</button>
     </div>
 
-    <div class="status-msg" id="statusMsg">Uncapped Betting & Giant Reels Live!</div>
+    <div class="status-msg" id="statusMsg">🌍 Port-443 School-Friendly Multiplayer Active • Click your name at the top right to customize your profile!</div>
   </div>
 
-  <!-- SIDE PANEL: CLEAN 2-COLUMN PAYTABLE & STATS -->
+  <!-- SIDE PANEL: REAL MULTIPLAYER LEADERBOARD, LIVE CHAT & PAYTABLE -->
   <div class="side-panel">
-    <div>
-      <div class="panel-title">💎 5-Line Paytable</div>
+    <div class="side-tabs">
+      <button class="side-tab-btn active" id="sideTabLb">🏆 LIVE LEADERS</button>
+      <button class="side-tab-btn" id="sideTabChat">💬 GLOBAL CHAT</button>
+      <button class="side-tab-btn" id="sideTabInfo">💎 PAYTABLE</button>
+    </div>
+
+    <!-- PANE 1: REAL ONLINE LEADERBOARD -->
+    <div id="paneLb" class="side-tab-pane active">
+      <div class="profile-bar">
+        <span>👤 <b id="sideProfileLabel" style="color:var(--cyan);">Player</b></span>
+        <button class="btn-mp" id="editProfileSideBtn" style="padding:4px 8px; font-size:10px;">✏️ CHANGE USERNAME</button>
+      </div>
+      <div class="lb-list" id="leaderboardList"></div>
+      <button class="rain-btn" id="makeItRainBtn">🌧️ MAKE IT RAIN ($1,000 TO ONLINE PLAYERS)</button>
+    </div>
+
+    <!-- PANE 2: LIVE MULTIPLAYER CHAT & RAIN -->
+    <div id="paneChat" class="side-tab-pane">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Chat with everyone online..." maxlength="110" />
+        <button class="btn-mp" id="sendChatBtn">SEND</button>
+      </div>
+    </div>
+
+    <!-- PANE 3: PAYTABLE & STATS -->
+    <div id="paneInfo" class="side-tab-pane">
       <div class="payout-grid">
         <div class="payout-card wide">
           <span class="payout-sym">7️⃣ 7️⃣ 7️⃣</span>
@@ -598,13 +992,16 @@
           <span class="payout-mult">6x</span>
         </div>
         <div class="payout-card">
-          <span class="payout-sym">🍇/🍋/🍒</span>
-          <span class="payout-mult">3x</span>
+          <span class="payout-sym">🎡 Straight</span>
+          <span class="payout-mult">36x Payout</span>
         </div>
-        <div class="payout-card">
-          <span class="payout-sym">2x 7️⃣/💎/🃏</span>
-          <span class="payout-mult">1.5x</span>
-        </div>
+      </div>
+
+      <div class="stats-mini">
+        <div><span>Total Slot Spins:</span><span class="val" id="statSpins">0</span></div>
+        <div><span>Plinko / Roulette Plays:</span><span class="val" id="statDrops">0</span></div>
+        <div><span>MP Battles Won:</span><span class="val" id="statMpWins">0</span></div>
+        <div><span>Biggest Single Win:</span><span class="val" id="statBest">$0</span></div>
       </div>
     </div>
 
@@ -619,21 +1016,27 @@
       </div>
     </div>
 
-    <div class="stats-mini">
-      <div><span>Total Slot Spins:</span><span class="val" id="statSpins">0</span></div>
-      <div><span>Plinko Balls Dropped:</span><span class="val" id="statDrops">0</span></div>
-      <div><span>Biggest Single Win:</span><span class="val" id="statBest">$0</span></div>
-      <div><span>Reel Hold Cost:</span><span class="val" id="statHoldCost">$0</span></div>
-    </div>
-
     <div class="save-footer">
       <button class="bailout-btn" id="bailoutBtn">🆘 BROKE! CLAIM $5000 BAILOUT</button>
-      <div class="save-status" id="saveStatus">💾 Auto-Save Active</div>
+      <div class="save-status" id="saveStatus">🛡️ Aegis Signed Auto-Save Active</div>
       <div class="footer-btns">
-        <button class="changelog-side-btn" id="openChangelogSide">📜 Changelog</button>
+        <button class="changelog-side-btn" id="openProfileFooterBtn">👤 Edit Username</button>
         <button class="reset-btn" id="resetSaveBtn">🗑️ Reset Save</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- USERNAME & AVATAR SETUP MODAL -->
+<div class="modal-backdrop" id="profileModal">
+  <div class="changelog-box">
+    <h2 class="changelog-title">👤 CHOOSE YOUR ONLINE IDENTITY</h2>
+    <div class="changelog-sub">Your custom username and avatar appear live on the Global Leaderboard, Chat & Multiplayer Slot Battle rooms!</div>
+    <label style="font-size:11px; font-weight:900; color:var(--cyan); display:block; margin-bottom:5px;">YOUR USERNAME (2–15 chars):</label>
+    <input type="text" id="modalUsernameInput" class="username-modal-input" maxlength="15" placeholder="Enter your username..." />
+    <label style="font-size:11px; font-weight:900; color:var(--cyan); display:block; margin-top:8px;">CHOOSE YOUR AVATAR:</label>
+    <div class="avatar-grid" id="avatarGrid"></div>
+    <button class="btn-collect" id="saveProfileBtn">🚀 SAVE IDENTITY & PLAY ONLINE</button>
   </div>
 </div>
 
@@ -651,24 +1054,125 @@
   </div>
 </div>
 
-<!-- v2.0 CHANGELOG MODAL -->
-<div class="modal-backdrop" id="changelogModal">
+<!-- AEGIS ANTICHEAT SECURITY MODAL -->
+<div class="modal-backdrop" id="anticheatModal">
   <div class="changelog-box">
-    <h2 class="changelog-title">🚀 UPDATE v2.0: HIGH ROLLER EXPANSION</h2>
-    <div class="changelog-sub">Your v1.0 bankroll, jackpot, and stats have been automatically carried over!</div>
+    <h2 class="changelog-title">🛡️ AEGIS VAULT™ ANTICHEAT ENGINE</h2>
+    <div class="changelog-sub">Real-time memory encapsulation, console honeypots & cryptographic save signing</div>
     <div class="changelog-list">
-      <div class="changelog-item">💸 <b>Custom Typed & Uncapped Betting:</b> Type any exact bet amount into the <b>$</b> box, or smash <b>MAX (ALL-IN)</b> with zero bet ceiling!</div>
-      <div class="changelog-item">🟣 <b>New Game Mode — NEON PLINKO:</b> Switch tabs at the top to drop oversized neon balls down an 8-row peg pyramid with <b>Low (5.6x)</b>, <b>Medium (15x)</b>, or <b>High Risk (50x)</b> buckets.</div>
-      <div class="changelog-item">🖥️ <b>Expanded Widescreen Stage:</b> Enlarged slot symbols, high-res Plinko pegs, and a spacious full-screen layout with zero scrolling required.</div>
-      <div class="changelog-item">💾 <b>100% Save Compatibility:</b> Seamless migration from v1 saves.</div>
+      <div class="changelog-item">🔒 <b>Closure-Isolated Memory Vault:</b> Your bankroll is stored inside an inaccessible private closure with randomized XOR shadow checksums—console commands (`balance = 999999`) cannot touch real funds.</div>
+      <div class="changelog-item">🚨 <b>Global Honeypot Traps:</b> Attempting to modify `window.balance` or `window.jackpot` via DevTools triggers an immediate intrusion alarm.</div>
+      <div class="changelog-item">✍️ <b>Signed Save & Packet Verification:</b> Every `localStorage` save and multiplayer leaderboard packet is signed with a salted hash.</div>
+      <div class="changelog-item">👁️ <b>DOM Mutation Sentinel:</b> Editing `#balanceDisplay` via Inspect Element is immediately reverted.</div>
+      <div class="changelog-item">📊 <b>Security Audit Log:</b> <span id="acLogStatus" style="color:var(--green); font-weight:900;">0 Intrusion Attempts Blocked</span></div>
     </div>
-    <button class="btn-collect" id="closeChangelogBtn">🔥 LET'S ROLL!</button>
+    <div style="display:flex; gap:8px;">
+      <button class="btn-mp purple" id="testHackBtn" style="flex:1; padding:10px;">🧪 TEST HACK BLOCK</button>
+      <button class="btn-collect" id="closeAnticheatBtn" style="flex:1;">✅ CLOSE</button>
+    </div>
   </div>
 </div>
 
 <script>
+(() => {
+  "use strict";
+
+  // ============================================================================
+  // 1. AEGIS VAULT™ ANTICHEAT & CRYPTOGRAPHIC INTEGRITY ENGINE
+  // ============================================================================
   const SAVE_KEY = 'neon_royale_777_save_v1';
-  const CHANGELOG_SEEN_KEY = 'neon_royale_777_changelog_v2_seen';
+  const PROFILE_SET_KEY = 'neon_royale_777_profile_configured_v35';
+  const SECRET_SALT = 'AEGIS_NEON_ROYALE_777_V35_SALT_99481';
+
+  let sessionKey = (Math.random() * 0x7fffffff) | 0;
+  let _maskedBalance = 5000 ^ sessionKey;
+  let _shadowHash = computeHash(5000);
+  let cheatStrikes = 0;
+
+  function computeHash(input) {
+    let str = SECRET_SALT + ':' + String(input);
+    let h1 = 0xdeadbeef ^ str.length, h2 = 0x41c6ce57 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      let ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  }
+
+  function computePayloadSignature(obj) {
+    const core = `${obj.balance}|${obj.jackpot}|${obj.totalSpins}|${obj.totalPlinkoDrops}|${obj.biggestWin}|${obj.mpWins || 0}`;
+    return computeHash(core);
+  }
+
+  function getBalance() {
+    const raw = _maskedBalance ^ sessionKey;
+    if (computeHash(raw) !== _shadowHash) {
+      flagCheatAttempt("Memory Checksum Mismatch");
+      setBalance(5000);
+      return 5000;
+    }
+    return raw;
+  }
+
+  function setBalance(newVal) {
+    const clean = Math.max(0, Math.floor(Number(newVal) || 0));
+    sessionKey = (Math.random() * 0x7fffffff) | 0;
+    _maskedBalance = clean ^ sessionKey;
+    _shadowHash = computeHash(clean);
+    return clean;
+  }
+
+  function addBalance(delta) {
+    const d = Math.floor(Number(delta) || 0);
+    return setBalance(getBalance() + d);
+  }
+
+  function flagCheatAttempt(source) {
+    cheatStrikes++;
+    const cab = document.getElementById('cabinet');
+    const badge = document.getElementById('openAnticheatBtn');
+    const logEl = document.getElementById('acLogStatus');
+    const statusEl = document.getElementById('statusMsg');
+
+    if (cab) {
+      cab.classList.add('cheat-alert');
+      setTimeout(() => cab.classList.remove('cheat-alert'), 1400);
+    }
+    if (badge) {
+      badge.classList.add('compromised');
+      badge.textContent = `🚨 ${cheatStrikes} BLOCKED`;
+    }
+    if (logEl) {
+      logEl.style.color = '#ff1744';
+      logEl.textContent = `${cheatStrikes} Intrusion Attempt(s) Blocked (${source})`;
+    }
+    if (statusEl) {
+      statusEl.textContent = `🚨 AEGIS ANTICHEAT: Blocked unauthorized money hack (${source})!`;
+    }
+    playSound(130, 'sawtooth', 0.45, 0.2, 70);
+  }
+
+  // DevTools Console Honeypot Traps
+  ['balance', 'money', 'bankroll', 'jackpot', 'coins', 'credits'].forEach(prop => {
+    try {
+      Object.defineProperty(window, prop, {
+        configurable: false,
+        get() { return "🛡️ Protected by Aegis Vault™"; },
+        set(v) { flagCheatAttempt(`Console window.${prop} = ${v}`); }
+      });
+    } catch (e) {}
+  });
+
+  // ============================================================================
+  // 2. PLAYER IDENTITY, GAME STATE & CORE CONFIGURATION
+  // ============================================================================
+  const AVATARS = ['😎', '🦈', '👑', '🐉', '🦊', '⚡', '💎', '🤠', '👾', '🦁', '🃏', '🚀'];
+  const clientId = 'p_' + Math.random().toString(36).slice(2, 10);
+  let playerName = 'Roller' + Math.floor(100 + Math.random() * 899);
+  let playerAvatar = '😎';
 
   const SYMBOLS = [
     { sym: '🍒', weight: 26, mult: 3 },
@@ -689,16 +1193,14 @@
     [2, 1, 0]
   ];
 
-  const LEGACY_BET_TIERS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000];
-
   let currentBet = 50;
-  let balance = 5000;
   let displayedBalance = 5000;
   let jackpot = 25000;
   let lastWin = 0;
   let totalSpins = 0;
   let totalPlinkoDrops = 0;
   let biggestWin = 0;
+  let mpWins = 0;
 
   let activeGame = 'slots';
   let spinning = false;
@@ -715,17 +1217,7 @@
     ['🔔', '7️⃣', '🍀']
   ];
 
-  const PLINKO_MULTIPLIERS = {
-    low:  [5.6, 2.2, 1.2, 0.8, 0.5, 0.8, 1.2, 2.2, 5.6],
-    med:  [15,  4,   1.6, 0.6, 0.3, 0.6, 1.6, 4,   15],
-    high: [50,  7,   1.5, 0.3, 0.1, 0.3, 1.5, 7,   50]
-  };
-  let plinkoRisk = 'med';
-  let plinkoBalls = [];
-  let plinkoPegs = [];
-  let plinkoBuckets = [];
-  let bucketFlash = new Array(9).fill(0);
-
+  // DOM References
   const elBalance = document.getElementById('balanceDisplay');
   const elBet = document.getElementById('betDisplay');
   const elCustomBetInput = document.getElementById('customBetInput');
@@ -743,25 +1235,122 @@
   const holdBtns = [0, 1, 2].map(i => document.getElementById('hold' + i));
   const reelCols = [0, 1, 2].map(i => document.getElementById('col' + i));
 
+  // DOM Mutation Sentinel
+  let internalDomUpdate = false;
+  const domObserver = new MutationObserver(() => {
+    if (!internalDomUpdate) {
+      const expected = formatNum(displayedBalance);
+      if (elBalance.textContent !== expected) {
+        internalDomUpdate = true;
+        elBalance.textContent = expected;
+        internalDomUpdate = false;
+        flagCheatAttempt("DOM Inspect Element Edit");
+      }
+    }
+  });
+  domObserver.observe(elBalance, { childList: true, characterData: true, subtree: true });
+
+  // ============================================================================
+  // 3. USERNAME & AVATAR MODAL SYSTEM
+  // ============================================================================
+  const elProfileModal = document.getElementById('profileModal');
+  const elModalUsername = document.getElementById('modalUsernameInput');
+  const elAvatarGrid = document.getElementById('avatarGrid');
+  let tempSelectedAvatar = playerAvatar;
+
+  function renderAvatarPicker() {
+    elAvatarGrid.innerHTML = '';
+    AVATARS.forEach(av => {
+      const div = document.createElement('div');
+      div.className = 'avatar-option' + (av === tempSelectedAvatar ? ' selected' : '');
+      div.textContent = av;
+      div.onclick = () => {
+        tempSelectedAvatar = av;
+        renderAvatarPicker();
+        playSound(540, 'sine', 0.05, 0.06);
+      };
+      elAvatarGrid.appendChild(div);
+    });
+  }
+
+  function openProfileModal() {
+    tempSelectedAvatar = playerAvatar;
+    elModalUsername.value = playerName;
+    renderAvatarPicker();
+    elProfileModal.classList.add('open');
+    setTimeout(() => elModalUsername.focus(), 80);
+  }
+
+  function saveProfileIdentity() {
+    const rawName = elModalUsername.value.trim().replace(/[^a-zA-Z0-9_\-\s]/g, '');
+    if (rawName.length < 2) {
+      elModalUsername.style.borderColor = '#ff1744';
+      playSound(180, 'sawtooth', 0.18, 0.1);
+      return;
+    }
+    elModalUsername.style.borderColor = 'var(--cyan)';
+    const oldName = playerName;
+    playerName = rawName.slice(0, 15);
+    playerAvatar = tempSelectedAvatar;
+
+    localStorage.setItem(PROFILE_SET_KEY, 'true');
+    syncProfileUI();
+    saveGame();
+    elProfileModal.classList.remove('open');
+    playWinChord();
+
+    broadcastPresence();
+    if (currentRoomState && currentRoomState.players[clientId]) {
+      currentRoomState.players[clientId].name = playerName;
+      currentRoomState.players[clientId].emoji = playerAvatar;
+      broadcastRoomPacket({ type: 'room_profile_update', senderId: clientId, name: playerName, emoji: playerAvatar });
+      renderBattleCards();
+    }
+    if (oldName !== playerName) {
+      publishGlobalPacket({ type: 'chat', user: '🌍 LOBBY', text: `${playerAvatar} ${playerName} joined the casino floor!`, isSys: true });
+    }
+  }
+
+  function syncProfileUI() {
+    document.getElementById('topUserAvatar').textContent = playerAvatar;
+    document.getElementById('topUserName').textContent = playerName;
+    document.getElementById('sideProfileLabel').textContent = `${playerAvatar} ${playerName}`;
+    renderLeaderboard();
+  }
+
+  document.getElementById('openProfileBtn').onclick = openProfileModal;
+  document.getElementById('editProfileSideBtn').onclick = openProfileModal;
+  document.getElementById('openProfileFooterBtn').onclick = openProfileModal;
+  document.getElementById('saveProfileBtn').onclick = saveProfileIdentity;
+  elModalUsername.addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveProfileIdentity();
+  });
+
+  // ============================================================================
+  // 4. SAVE & LOAD WITH AEGIS SIGNATURE MIGRATION
+  // ============================================================================
   function saveGame() {
     try {
       const data = {
-        balance,
+        balance: getBalance(),
         jackpot,
         currentBet,
         totalSpins,
         totalPlinkoDrops,
         biggestWin,
+        mpWins,
+        playerName,
+        playerAvatar,
         feverCharge,
         feverSpinsLeft,
         plinkoRisk,
-        grid
+        grid,
+        v: 3
       };
+      data.aegis_sig = computePayloadSignature(data);
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-      elSaveStatus.textContent = '💾 Saved Just Now';
-    } catch (e) {
-      console.warn('Could not save game:', e);
-    }
+      elSaveStatus.textContent = '🛡️ Aegis Signed Save Active';
+    } catch (e) {}
   }
 
   function loadGame() {
@@ -769,22 +1358,34 @@
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return;
       const data = JSON.parse(raw);
+
+      if (data.v === 3) {
+        const expectedSig = computePayloadSignature(data);
+        if (data.aegis_sig !== expectedSig) {
+          flagCheatAttempt("Forged LocalStorage Save Signature");
+          setBalance(5000);
+          displayedBalance = 5000;
+          saveGame();
+          return;
+        }
+      }
+
       if (typeof data.balance === 'number' && !isNaN(data.balance)) {
-        balance = Math.max(0, Math.floor(data.balance));
-        displayedBalance = balance;
+        setBalance(Math.max(0, Math.floor(data.balance)));
+        displayedBalance = getBalance();
       }
       if (typeof data.jackpot === 'number' && !isNaN(data.jackpot)) jackpot = Math.floor(data.jackpot);
-
-      if (typeof data.currentBet === 'number' && data.currentBet >= 1) {
-        currentBet = Math.floor(data.currentBet);
-      } else if (typeof data.betIndex === 'number') {
-        const idx = Math.max(0, Math.min(LEGACY_BET_TIERS.length - 1, data.betIndex));
-        currentBet = LEGACY_BET_TIERS[idx];
-      }
-
+      if (typeof data.currentBet === 'number' && data.currentBet >= 1) currentBet = Math.floor(data.currentBet);
       if (typeof data.totalSpins === 'number') totalSpins = data.totalSpins;
       if (typeof data.totalPlinkoDrops === 'number') totalPlinkoDrops = data.totalPlinkoDrops;
       if (typeof data.biggestWin === 'number') biggestWin = data.biggestWin;
+      if (typeof data.mpWins === 'number') mpWins = data.mpWins;
+      if (typeof data.playerName === 'string' && data.playerName.trim()) {
+        playerName = data.playerName.trim().slice(0, 15);
+      }
+      if (typeof data.playerAvatar === 'string' && AVATARS.includes(data.playerAvatar)) {
+        playerAvatar = data.playerAvatar;
+      }
       if (typeof data.feverCharge === 'number') feverCharge = data.feverCharge;
       if (typeof data.feverSpinsLeft === 'number') feverSpinsLeft = data.feverSpinsLeft;
       if (data.plinkoRisk && PLINKO_MULTIPLIERS[data.plinkoRisk]) plinkoRisk = data.plinkoRisk;
@@ -808,28 +1409,20 @@
       elCustomBetInput.value = currentBet;
       document.getElementById('statSpins').textContent = formatNum(totalSpins);
       document.getElementById('statDrops').textContent = formatNum(totalPlinkoDrops);
+      document.getElementById('statMpWins').textContent = formatNum(mpWins);
       document.getElementById('statBest').textContent = '$' + formatNum(biggestWin);
-      elBalance.textContent = formatNum(balance);
+      internalDomUpdate = true;
+      elBalance.textContent = formatNum(getBalance());
+      internalDomUpdate = false;
+      syncProfileUI();
       updateRiskButtons();
-    } catch (e) {
-      console.warn('Failed to load save:', e);
-    }
-  }
-
-  const elChangelogModal = document.getElementById('changelogModal');
-  function checkChangelogOnce() {
-    try {
-      const seen = localStorage.getItem(CHANGELOG_SEEN_KEY);
-      if (!seen) {
-        elChangelogModal.classList.add('open');
-        localStorage.setItem(CHANGELOG_SEEN_KEY, 'true');
-      }
+      saveGame();
     } catch (e) {}
   }
-  document.getElementById('openChangelogTop').onclick = () => elChangelogModal.classList.add('open');
-  document.getElementById('openChangelogSide').onclick = () => elChangelogModal.classList.add('open');
-  document.getElementById('closeChangelogBtn').onclick = () => elChangelogModal.classList.remove('open');
 
+  // ============================================================================
+  // 5. SOUND SYNTHESIS & UI HELPERS
+  // ============================================================================
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   const audioCtx = new AudioCtx();
 
@@ -855,11 +1448,14 @@
   }
 
   function animateBalance() {
-    if (displayedBalance !== balance) {
-      const diff = balance - displayedBalance;
+    const realBal = getBalance();
+    if (displayedBalance !== realBal) {
+      const diff = realBal - displayedBalance;
       const step = Math.ceil(Math.abs(diff) * 0.18);
       displayedBalance += diff > 0 ? step : -step;
+      internalDomUpdate = true;
       elBalance.textContent = formatNum(displayedBalance);
+      internalDomUpdate = false;
       if (diff > 0 && Math.random() < 0.35) playSound(880 + Math.random()*200, 'sine', 0.04, 0.04);
     }
     requestAnimationFrame(animateBalance);
@@ -877,15 +1473,26 @@
   }
 
   function updateUI() {
-    const totalCost = getBet() + getHoldCost();
-    elBet.textContent = formatNum(totalCost);
-    document.getElementById('statHoldCost').textContent = '$' + formatNum(getHoldCost());
+    const bal = getBalance();
+    let shownBet = getBet() + getHoldCost();
+    if (activeGame === 'roulette') shownBet = getRouletteTotalBet() || getBet();
+    if (activeGame === 'battle') shownBet = getBet() * 10;
+
+    elBet.textContent = formatNum(shownBet);
     elJackpot.textContent = formatNum(jackpot);
 
+    if (currentRoomState && currentRoomState.hostId === clientId && !currentRoomState.running) {
+      currentRoomState.spinStake = getBet();
+      document.getElementById('battleSpinStakeText').textContent = formatNum(currentRoomState.spinStake);
+      document.getElementById('battleBuyInText').textContent = formatNum(currentRoomState.spinStake * 10);
+      const pCount = Object.keys(currentRoomState.players).length;
+      document.getElementById('battlePotText').textContent = formatNum(currentRoomState.spinStake * 10 * pCount);
+    }
+
     const vip = document.getElementById('vipBadge');
-    if (balance >= 1000000) vip.textContent = '🌌 LEVIATHAN';
-    else if (balance >= 100000) vip.textContent = '👑 WHALE VIP';
-    else if (balance >= 25000) vip.textContent = '💎 HIGH ROLLER';
+    if (bal >= 1000000) vip.textContent = '🌌 LEVIATHAN';
+    else if (bal >= 100000) vip.textContent = '👑 WHALE VIP';
+    else if (bal >= 25000) vip.textContent = '💎 HIGH ROLLER';
     else vip.textContent = 'VIP TIER I';
 
     holdBtns.forEach((btn, i) => {
@@ -894,47 +1501,90 @@
       btn.disabled = spinning || !canHold;
     });
 
-    elBailoutBtn.style.display = (!spinning && plinkoBalls.length === 0 && balance < 1) ? 'block' : 'none';
+    elBailoutBtn.style.display = (!spinning && plinkoBalls.length === 0 && !rouletteSpinning && !(currentRoomState && currentRoomState.running) && bal < 1) ? 'block' : 'none';
+    renderLeaderboard();
   }
 
+  // ============================================================================
+  // 6. NAVIGATION TABS
+  // ============================================================================
   document.getElementById('tabSlots').onclick = () => switchGameMode('slots');
   document.getElementById('tabPlinko').onclick = () => switchGameMode('plinko');
+  document.getElementById('tabRoulette').onclick = () => switchGameMode('roulette');
+  document.getElementById('tabBattle').onclick = () => switchGameMode('battle');
 
   function switchGameMode(mode) {
-    if (spinning) return;
+    if (spinning || rouletteSpinning || (currentRoomState && currentRoomState.running)) return;
     activeGame = mode;
     autoPlay = false;
     elAutoBtn.classList.remove('active');
 
     document.getElementById('tabSlots').classList.toggle('active', mode === 'slots');
     document.getElementById('tabPlinko').classList.toggle('active', mode === 'plinko');
+    document.getElementById('tabRoulette').classList.toggle('active', mode === 'roulette');
+    document.getElementById('tabBattle').classList.toggle('active', mode === 'battle');
+
     document.getElementById('slotsView').style.display = mode === 'slots' ? 'flex' : 'none';
     document.getElementById('plinkoView').style.display = mode === 'plinko' ? 'flex' : 'none';
-    document.getElementById('betCardTitle').textContent = mode === 'slots' ? 'Total Bet (5 Lines)' : 'Ball Drop Bet';
-    elSpinBtn.textContent = mode === 'slots' ? 'SPIN (SPACE)' : 'DROP BALL (SPACE)';
-    if (mode === 'plinko') elGambleBtn.style.display = 'none';
+    document.getElementById('rouletteView').style.display = mode === 'roulette' ? 'flex' : 'none';
+    document.getElementById('battleView').style.display = mode === 'battle' ? 'flex' : 'none';
+
+    const titleMap = {
+      slots: 'Total Bet (5 Lines)',
+      plinko: 'Ball Drop Bet',
+      roulette: 'Roulette Table Bet',
+      battle: '10-Spin Battle Buy-In'
+    };
+    const btnMap = {
+      slots: 'SPIN REELS (SPACE)',
+      plinko: 'DROP BALL (SPACE)',
+      roulette: '🎡 SPIN WHEEL (SPACE)',
+      battle: '⚔️ START 10-SPIN BATTLE'
+    };
+    document.getElementById('betCardTitle').textContent = titleMap[mode];
+    elSpinBtn.textContent = btnMap[mode];
+    if (mode !== 'slots') elGambleBtn.style.display = 'none';
 
     playSound(520, 'triangle', 0.1, 0.08);
     updateUI();
   }
 
+  const sideTabs = [
+    { btn: 'sideTabLb', pane: 'paneLb' },
+    { btn: 'sideTabChat', pane: 'paneChat' },
+    { btn: 'sideTabInfo', pane: 'paneInfo' }
+  ];
+  sideTabs.forEach(t => {
+    document.getElementById(t.btn).onclick = () => {
+      sideTabs.forEach(o => {
+        document.getElementById(o.btn).classList.toggle('active', o.btn === t.btn);
+        document.getElementById(o.pane).classList.toggle('active', o.pane === t.pane);
+      });
+      playSound(460, 'sine', 0.06, 0.06);
+    };
+  });
+
+  // ============================================================================
+  // 7. BETTING CONTROLS & ANTICHEAT MODAL
+  // ============================================================================
   function setCustomBet(amount, syncInput = true) {
-    if (spinning) return;
+    if (spinning || rouletteSpinning || (currentRoomState && currentRoomState.running)) return;
     let parsed = Math.floor(Number(amount));
     if (isNaN(parsed) || parsed < 1) parsed = 1;
     currentBet = parsed;
     if (syncInput) elCustomBetInput.value = currentBet;
+    if (currentRoomState && currentRoomState.hostId === clientId && !currentRoomState.running) {
+      currentRoomState.spinStake = currentBet;
+      broadcastRoomState();
+    }
     saveGame();
     updateUI();
   }
 
   elCustomBetInput.addEventListener('input', () => {
     const val = Math.floor(Number(elCustomBetInput.value));
-    if (!isNaN(val) && val >= 1) {
-      setCustomBet(val, false);
-    }
+    if (!isNaN(val) && val >= 1) setCustomBet(val, false);
   });
-
   elCustomBetInput.addEventListener('blur', () => {
     const val = Math.floor(Number(elCustomBetInput.value));
     setCustomBet(isNaN(val) || val < 1 ? 1 : val, true);
@@ -947,26 +1597,32 @@
   document.getElementById('betUp').onclick = () => { playSound(540, 'sine', 0.06, 0.08); setCustomBet(Math.max(currentBet + 1, Math.ceil(currentBet * 1.1))); };
   document.getElementById('betMax').onclick = () => {
     playSound(680, 'triangle', 0.1, 0.1);
-    const heldCount = activeGame === 'slots' ? heldReels.filter(Boolean).length : 0;
-    const divisor = heldCount === 0 ? 1 : (heldCount === 1 ? 1.5 : 2.5);
-    setCustomBet(Math.max(1, Math.floor(balance / divisor)));
+    const bal = getBalance();
+    if (activeGame === 'battle') {
+      setCustomBet(Math.max(1, Math.floor(bal / 10)));
+    } else {
+      const heldCount = activeGame === 'slots' ? heldReels.filter(Boolean).length : 0;
+      const divisor = heldCount === 0 ? 1 : (heldCount === 1 ? 1.5 : 2.5);
+      setCustomBet(Math.max(1, Math.floor(bal / divisor)));
+    }
   };
 
   elBailoutBtn.onclick = () => {
-    if (spinning || plinkoBalls.length > 0 || balance >= 1) return;
-    balance = 5000;
+    if (spinning || plinkoBalls.length > 0 || rouletteSpinning || (currentRoomState && currentRoomState.running) || getBalance() >= 1) return;
+    setBalance(5000);
     setCustomBet(10);
     saveGame();
     updateUI();
+    broadcastPresence();
     playSound(440, 'triangle', 0.2, 0.12);
-    elStatus.textContent = "🆘 $5000 Bankruptcy Bailout granted. Rebuild your empire!";
+    elStatus.textContent = "🆘 $5,000 Bankruptcy Bailout granted by Aegis Reserve!";
   };
 
   document.getElementById('resetSaveBtn').onclick = () => {
-    if (spinning || plinkoBalls.length > 0) return;
+    if (spinning || plinkoBalls.length > 0 || rouletteSpinning || (currentRoomState && currentRoomState.running)) return;
     if (confirm("Are you sure you want to wipe your save data and reset back to $5,000?")) {
       localStorage.removeItem(SAVE_KEY);
-      balance = 5000;
+      setBalance(5000);
       displayedBalance = 5000;
       jackpot = 25000;
       currentBet = 50;
@@ -974,25 +1630,39 @@
       totalSpins = 0;
       totalPlinkoDrops = 0;
       biggestWin = 0;
+      mpWins = 0;
       feverCharge = 0;
       feverSpinsLeft = 0;
       heldReels = [false, false, false];
       canHold = false;
+      clearRouletteBets(false);
       document.body.classList.remove('fever-active');
       elFeverFill.style.width = '0%';
       elFeverText.textContent = '🔥 FEVER METER (0%)';
       document.getElementById('statSpins').textContent = '0';
       document.getElementById('statDrops').textContent = '0';
+      document.getElementById('statMpWins').textContent = '0';
       document.getElementById('statBest').textContent = '$0';
       elWin.textContent = '0';
-      elBalance.textContent = formatNum(balance);
+      internalDomUpdate = true;
+      elBalance.textContent = formatNum(getBalance());
+      internalDomUpdate = false;
       clearVisualWins();
       saveGame();
       updateUI();
+      broadcastPresence();
       elStatus.textContent = "Save data wiped! Fresh $5,000 bankroll loaded.";
     }
   };
 
+  const elAnticheatModal = document.getElementById('anticheatModal');
+  document.getElementById('openAnticheatBtn').onclick = () => elAnticheatModal.classList.add('open');
+  document.getElementById('closeAnticheatBtn').onclick = () => elAnticheatModal.classList.remove('open');
+  document.getElementById('testHackBtn').onclick = () => { window.balance = 999999999; };
+
+  // ============================================================================
+  // 8. GAME 1: 777 SLOTS ENGINE
+  // ============================================================================
   holdBtns.forEach((btn, idx) => {
     btn.onclick = () => {
       if (spinning || !canHold) return;
@@ -1025,23 +1695,16 @@
     elGambleBtn.style.display = 'none';
   }
 
-  function triggerMainAction() {
-    if (activeGame === 'slots') spin();
-    else dropPlinkoBall();
-  }
-
   function spin() {
     if (spinning) return;
     const totalBet = getBet() + getHoldCost();
 
-    if (balance < totalBet) {
+    if (getBalance() < totalBet) {
       autoPlay = false;
       elAutoBtn.classList.remove('active');
-      if (balance < 1) {
-        elStatus.textContent = "You're stone-cold broke! Claim the $5000 Bailout on the right!";
-      } else {
-        elStatus.textContent = `Insufficient Bankroll for $${formatNum(totalBet)} bet! Lower your bet or unlock reels!`;
-      }
+      elStatus.textContent = getBalance() < 1
+        ? "You're broke! Claim the $5,000 Bailout on the bottom right!"
+        : `Insufficient Bankroll for $${formatNum(totalBet)} spin!`;
       playSound(160, 'sawtooth', 0.3, 0.12);
       updateUI();
       return;
@@ -1051,7 +1714,7 @@
     elSpinBtn.disabled = true;
     clearVisualWins();
 
-    balance -= totalBet;
+    addBalance(-totalBet);
     jackpot += Math.ceil(totalBet * 0.18);
     totalSpins++;
     document.getElementById('statSpins').textContent = formatNum(totalSpins);
@@ -1087,8 +1750,8 @@
     });
 
     const isNearMiss = !heldReels[2] && checkPotentialBigHit(nextGrid[0], nextGrid[1]);
-
     const intervals = [];
+
     reelCols.forEach((colEl, colIdx) => {
       if (heldReels[colIdx]) {
         playSound(400 + colIdx * 100, 'sine', 0.08, 0.06);
@@ -1107,15 +1770,15 @@
         playSound(150 + colIdx * 45 + Math.random() * 30, 'triangle', 0.035, 0.035);
       }, 65);
 
-      const baseDelay = 550 + colIdx * 380;
-      const extraTease = (colIdx === 2 && isNearMiss) ? 950 : 0;
+      const baseDelay = 520 + colIdx * 360;
+      const extraTease = (colIdx === 2 && isNearMiss) ? 900 : 0;
 
       if (colIdx === 2 && isNearMiss) {
         setTimeout(() => {
           colEl.classList.add('tease');
           elStatus.textContent = "⚡ BIG WIN TEASE... COME ON! ⚡";
           playSound(280, 'sawtooth', 0.85, 0.1, 720);
-        }, 550 + 380);
+        }, 520 + 360);
       }
 
       setTimeout(() => {
@@ -1168,26 +1831,16 @@
       }
     });
 
-    if (isFeverSpin && totalPayout > 0 && !hitJackpot) {
-      totalPayout *= 3;
-    }
-
+    if (isFeverSpin && totalPayout > 0 && !hitJackpot) totalPayout *= 3;
     totalPayout = Math.round(totalPayout);
 
     if (totalPayout > 0) {
       canHold = false;
       lastWin = totalPayout;
-      balance += totalPayout;
-      if (totalPayout > biggestWin) {
-        biggestWin = totalPayout;
-        document.getElementById('statBest').textContent = '$' + formatNum(biggestWin);
-      }
+      addBalance(totalPayout);
+      checkBiggestWin(totalPayout, '777 Slots');
 
       elWin.textContent = formatNum(totalPayout);
-      const winCard = document.getElementById('winCard');
-      winCard.style.transform = 'scale(1.25)';
-      setTimeout(() => winCard.style.transform = 'scale(1)', 280);
-
       winningLines.forEach(idx => document.getElementById('line' + idx).classList.add('show'));
       winningCells.forEach(id => document.getElementById(id).classList.add('win-cell'));
 
@@ -1195,22 +1848,19 @@
       if (hitJackpot) {
         elStatus.textContent = `🚨 GRAND JACKPOT WON! +$${formatNum(totalPayout)}! 🚨`;
         playJackpotFanfare();
-        spawnParticles(160, true);
+        spawnParticles(150, true);
       } else if (multRatio >= 10) {
         elStatus.textContent = `💎 MEGA WIN (${winningLines.length} LINES)! +$${formatNum(totalPayout)}!`;
         playJackpotFanfare();
-        spawnParticles(100, true);
+        spawnParticles(90, true);
       } else {
         elStatus.textContent = `✨ WINNER (${winningLines.length} LINE${winningLines.length > 1 ? 'S' : ''})! +$${formatNum(totalPayout)}!`;
         playWinChord();
-        spawnParticles(45, false);
+        spawnParticles(40, false);
       }
 
       spawnFloatingText(`+$${formatNum(totalPayout)}`, window.innerWidth / 2, window.innerHeight / 2);
-
-      if (!autoPlay) {
-        elGambleBtn.style.display = 'block';
-      }
+      if (!autoPlay) elGambleBtn.style.display = 'block';
     } else {
       canHold = true;
       elStatus.textContent = "No win — Click HOLD on any reel to lock it for the next spin!";
@@ -1220,9 +1870,10 @@
     elSpinBtn.disabled = false;
     saveGame();
     updateUI();
+    broadcastPresence();
 
     if (autoPlay && activeGame === 'slots') {
-      setTimeout(() => { if (autoPlay && !spinning && activeGame === 'slots') spin(); }, 950);
+      setTimeout(() => { if (autoPlay && !spinning && activeGame === 'slots') spin(); }, 900);
     }
   }
 
@@ -1230,9 +1881,7 @@
     const arr = [s0, s1, s2];
     const nonWilds = arr.filter(s => s !== '🃏');
 
-    if (nonWilds.length === 0) {
-      return { payout: lineBet * 40, cells: [0, 1, 2], jackpot: false };
-    }
+    if (nonWilds.length === 0) return { payout: lineBet * 40, cells: [0, 1, 2], jackpot: false };
     const target = nonWilds[0];
     if (nonWilds.every(s => s === target)) {
       if (target === '7️⃣') {
@@ -1251,13 +1900,36 @@
     if (highSyms.includes(s1) && (s1 === s2 || s1 === '🃏' || s2 === '🃏')) {
       return { payout: lineBet * 7.5, cells: [1, 2], jackpot: false };
     }
-
     return { payout: 0, cells: [], jackpot: false };
   }
 
-  // ==========================================
-  // HIGH-RES NEON PLINKO ENGINE (820x440)
-  // ==========================================
+  function checkBiggestWin(amount, gameLabel) {
+    if (amount > biggestWin) {
+      biggestWin = amount;
+      document.getElementById('statBest').textContent = '$' + formatNum(biggestWin);
+    }
+    if (amount >= getBet() * 5 || amount >= 2500) {
+      publishGlobalPacket({
+        type: 'ticker',
+        text: `🔥 ${playerAvatar} ${playerName} just won +$${formatNum(amount)} on ${gameLabel}!`
+      });
+    }
+  }
+
+  // ============================================================================
+  // 9. GAME 2: NEON PLINKO ENGINE
+  // ============================================================================
+  const PLINKO_MULTIPLIERS = {
+    low:  [5.6, 2.2, 1.2, 0.8, 0.5, 0.8, 1.2, 2.2, 5.6],
+    med:  [15,  4,   1.6, 0.6, 0.3, 0.6, 1.6, 4,   15],
+    high: [50,  7,   1.5, 0.3, 0.1, 0.3, 1.5, 7,   50]
+  };
+  let plinkoRisk = 'med';
+  let plinkoBalls = [];
+  let plinkoPegs = [];
+  let plinkoBuckets = [];
+  let bucketFlash = new Array(9).fill(0);
+
   const pCanvas = document.getElementById('plinkoCanvas');
   const pCtx = pCanvas.getContext('2d');
   const PLINKO_ROWS = 8;
@@ -1275,12 +1947,7 @@
       const rowWidth = (pegsInRow - 1) * COL_SPACING;
       const startX = centerX - rowWidth / 2;
       for (let c = 0; c < pegsInRow; c++) {
-        plinkoPegs.push({
-          x: startX + c * COL_SPACING,
-          y: startY + r * ROW_SPACING,
-          r: 7,
-          glow: 0
-        });
+        plinkoPegs.push({ x: startX + c * COL_SPACING, y: startY + r * ROW_SPACING, r: 7, glow: 0 });
       }
     }
 
@@ -1289,13 +1956,7 @@
     const bStartX = centerX - totalBWidth / 2;
     const bY = startY + PLINKO_ROWS * ROW_SPACING + 16;
     for (let i = 0; i < bucketCount; i++) {
-      plinkoBuckets.push({
-        x: bStartX + i * COL_SPACING,
-        y: bY,
-        w: COL_SPACING - 6,
-        h: 40,
-        idx: i
-      });
+      plinkoBuckets.push({ x: bStartX + i * COL_SPACING, y: bY, w: COL_SPACING - 6, h: 40, idx: i });
     }
   }
   setupPlinkoGeometry();
@@ -1312,18 +1973,16 @@
 
   function dropPlinkoBall() {
     const bet = getBet();
-    if (balance < bet) {
+    if (getBalance() < bet) {
       autoPlay = false;
       elAutoBtn.classList.remove('active');
-      elStatus.textContent = balance < 1
-        ? "You're broke! Claim the $5000 Bailout on the right!"
-        : `Insufficient Bankroll for $${formatNum(bet)} ball drop!`;
+      elStatus.textContent = `Insufficient Bankroll for $${formatNum(bet)} ball drop!`;
       playSound(160, 'sawtooth', 0.25, 0.1);
       updateUI();
       return;
     }
 
-    balance -= bet;
+    addBalance(-bet);
     jackpot += Math.ceil(bet * 0.08);
     totalPlinkoDrops++;
     document.getElementById('statDrops').textContent = formatNum(totalPlinkoDrops);
@@ -1347,7 +2006,6 @@
   function updateAndRenderPlinko() {
     pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
 
-    // Draw Pegs
     for (const peg of plinkoPegs) {
       pCtx.beginPath();
       pCtx.arc(peg.x, peg.y, peg.r, 0, Math.PI * 2);
@@ -1365,7 +2023,6 @@
       pCtx.shadowBlur = 0;
     }
 
-    // Draw Buckets
     const mults = PLINKO_MULTIPLIERS[plinkoRisk];
     const bucketColors = ['#ff0055', '#ff5100', '#ffab00', '#00e676', '#00b0ff', '#00e676', '#ffab00', '#ff5100', '#ff0055'];
 
@@ -1391,7 +2048,6 @@
       pCtx.fillText(mults[i] + 'x', b.x + 3 + b.w / 2, b.y + yOffset + b.h / 2);
     }
 
-    // Update & Draw Balls
     for (let i = plinkoBalls.length - 1; i >= 0; i--) {
       const ball = plinkoBalls[i];
       ball.vy += 0.34;
@@ -1431,15 +2087,13 @@
       pCtx.fill();
       pCtx.shadowBlur = 0;
 
-      const bucketLineY = plinkoBuckets[0].y;
-      if (ball.y >= bucketLineY) {
+      if (ball.y >= plinkoBuckets[0].y) {
         let landedIdx = Math.floor((ball.x - plinkoBuckets[0].x) / COL_SPACING);
         landedIdx = Math.max(0, Math.min(8, landedIdx));
         resolvePlinkoBall(ball, landedIdx);
         plinkoBalls.splice(i, 1);
       }
     }
-
     requestAnimationFrame(updateAndRenderPlinko);
   }
   updateAndRenderPlinko();
@@ -1449,14 +2103,10 @@
     const mult = PLINKO_MULTIPLIERS[ball.risk][bucketIdx];
     const payout = Math.round(ball.bet * mult);
 
-    balance += payout;
+    addBalance(payout);
     lastWin = payout;
     elWin.textContent = formatNum(payout);
-
-    if (payout > biggestWin) {
-      biggestWin = payout;
-      document.getElementById('statBest').textContent = '$' + formatNum(biggestWin);
-    }
+    checkBiggestWin(payout, 'Neon Plinko');
 
     if (mult >= 10) {
       elStatus.textContent = `🚨 MASSIVE PLINKO HIT (${mult}x)! +$${formatNum(payout)}!`;
@@ -1471,11 +2121,1080 @@
       elStatus.textContent = `Plinko landed on ${mult}x ($${formatNum(payout)} returned).`;
       playSound(210, 'triangle', 0.1, 0.07);
     }
+    saveGame();
+    updateUI();
+    broadcastPresence();
+  }
 
+  // ============================================================================
+  // 10. GAME 3: NEON EUROPEAN ROULETTE
+  // ============================================================================
+  const ROULETTE_ORDER = [
+    0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
+    5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+  ];
+  const RED_NUMS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+
+  let rouletteBets = {};
+  let lastRouletteBets = {};
+  let rouletteSpinning = false;
+  let wheelAngle = 0;
+  let ballAngle = 0;
+  let ballRadius = 112;
+  let rouletteHistory = [17, 0, 32, 7, 24];
+
+  const rCanvas = document.getElementById('rouletteCanvas');
+  const rCtx = rCanvas.getContext('2d');
+
+  function getNumberColor(n) {
+    if (n === 0) return 'green';
+    return RED_NUMS.has(n) ? 'red' : 'black';
+  }
+
+  function buildRouletteBoard() {
+    const gridEl = document.getElementById('rouletteGrid');
+    gridEl.innerHTML = '';
+
+    const zeroCell = document.createElement('div');
+    zeroCell.className = 'r-cell zero';
+    zeroCell.dataset.bet = 'n0';
+    zeroCell.textContent = '0';
+    zeroCell.onclick = () => placeRouletteChip('n0');
+    gridEl.appendChild(zeroCell);
+
+    const rows = [3, 2, 1];
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 12; c++) {
+        const num = rows[r] + c * 3;
+        const cell = document.createElement('div');
+        cell.className = `r-cell ${getNumberColor(num)}`;
+        cell.dataset.bet = 'n' + num;
+        cell.textContent = num;
+        cell.onclick = () => placeRouletteChip('n' + num);
+        gridEl.appendChild(cell);
+      }
+    }
+
+    document.querySelectorAll('.r-out-btn').forEach(btn => {
+      btn.onclick = () => placeRouletteChip(btn.dataset.bet);
+    });
+    renderRouletteHistory();
+  }
+
+  function getRouletteTotalBet() {
+    return Object.values(rouletteBets).reduce((a, b) => a + b, 0);
+  }
+
+  function placeRouletteChip(betKey) {
+    if (rouletteSpinning) return;
+    const chip = getBet();
+    if (getBalance() < chip) {
+      elStatus.textContent = `Insufficient Bankroll for $${formatNum(chip)} chip!`;
+      playSound(160, 'sawtooth', 0.2, 0.1);
+      return;
+    }
+    addBalance(-chip);
+    rouletteBets[betKey] = (rouletteBets[betKey] || 0) + chip;
+    playSound(680, 'sine', 0.05, 0.09);
+    renderRouletteChips();
     saveGame();
     updateUI();
   }
 
+  function clearRouletteBets(refund = true) {
+    if (rouletteSpinning) return;
+    const total = getRouletteTotalBet();
+    if (refund && total > 0) {
+      addBalance(total);
+      playSound(320, 'triangle', 0.1, 0.08);
+    }
+    rouletteBets = {};
+    renderRouletteChips();
+    saveGame();
+    updateUI();
+  }
+
+  document.getElementById('clearRouletteBtn').onclick = () => clearRouletteBets(true);
+  document.getElementById('rebetRouletteBtn').onclick = () => {
+    if (rouletteSpinning) return;
+    const keys = Object.keys(lastRouletteBets);
+    if (keys.length === 0) return;
+    const needed = Object.values(lastRouletteBets).reduce((a, b) => a + b, 0);
+    if (getBalance() < needed) {
+      elStatus.textContent = `Need $${formatNum(needed)} to repeat last roulette bets!`;
+      return;
+    }
+    clearRouletteBets(true);
+    addBalance(-needed);
+    rouletteBets = { ...lastRouletteBets };
+    renderRouletteChips();
+    playSound(600, 'triangle', 0.08, 0.09);
+    saveGame();
+    updateUI();
+  };
+
+  function renderRouletteChips() {
+    document.querySelectorAll('.chip-marker').forEach(el => el.remove());
+    document.querySelectorAll('.winner-glow').forEach(el => el.classList.remove('winner-glow'));
+    Object.entries(rouletteBets).forEach(([key, amt]) => {
+      const target = document.querySelector(`[data-bet="${key}"]`);
+      if (target) {
+        const chip = document.createElement('div');
+        chip.className = 'chip-marker';
+        chip.textContent = amt >= 1000 ? (amt / 1000).toFixed(1).replace('.0','') + 'k' : '$' + amt;
+        target.appendChild(chip);
+      }
+    });
+    document.getElementById('rouletteTotalBet').textContent = formatNum(getRouletteTotalBet());
+  }
+
+  function renderRouletteHistory() {
+    const wrap = document.getElementById('rouletteHistory');
+    wrap.innerHTML = '';
+    rouletteHistory.slice(0, 7).forEach(num => {
+      const b = document.createElement('div');
+      b.className = `hist-ball ${getNumberColor(num)}`;
+      b.textContent = num;
+      wrap.appendChild(b);
+    });
+  }
+
+  function drawRouletteWheel() {
+    const cx = rCanvas.width / 2;
+    const cy = rCanvas.height / 2;
+    const outerR = 128;
+    const innerR = 72;
+    const slice = (Math.PI * 2) / 37;
+
+    rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+
+    rCtx.beginPath();
+    rCtx.arc(cx, cy, outerR + 6, 0, Math.PI * 2);
+    rCtx.fillStyle = '#1b0d38';
+    rCtx.fill();
+    rCtx.lineWidth = 3;
+    rCtx.strokeStyle = '#ffd700';
+    rCtx.stroke();
+
+    for (let i = 0; i < 37; i++) {
+      const num = ROULETTE_ORDER[i];
+      const startA = wheelAngle + i * slice - slice / 2;
+      const endA = startA + slice;
+
+      rCtx.beginPath();
+      rCtx.moveTo(cx, cy);
+      rCtx.arc(cx, cy, outerR, startA, endA);
+      rCtx.closePath();
+
+      const col = getNumberColor(num);
+      rCtx.fillStyle = col === 'green' ? '#00c853' : (col === 'red' ? '#d50000' : '#1b2329');
+      rCtx.fill();
+      rCtx.lineWidth = 1;
+      rCtx.strokeStyle = 'rgba(255,215,0,0.45)';
+      rCtx.stroke();
+
+      rCtx.save();
+      rCtx.translate(cx, cy);
+      rCtx.rotate(startA + slice / 2);
+      rCtx.fillStyle = '#fff';
+      rCtx.font = '900 10.5px "Segoe UI", sans-serif';
+      rCtx.textAlign = 'right';
+      rCtx.textBaseline = 'middle';
+      rCtx.fillText(String(num), outerR - 8, 0);
+      rCtx.restore();
+    }
+
+    rCtx.beginPath();
+    rCtx.arc(cx, cy, innerR, 0, Math.PI * 2);
+    const grad = rCtx.createRadialGradient(cx, cy, 8, cx, cy, innerR);
+    grad.addColorStop(0, '#ffd700');
+    grad.addColorStop(0.4, '#261157');
+    grad.addColorStop(1, '#090314');
+    rCtx.fillStyle = grad;
+    rCtx.fill();
+    rCtx.lineWidth = 2.5;
+    rCtx.strokeStyle = '#00f3ff';
+    rCtx.stroke();
+
+    const bx = cx + Math.cos(ballAngle) * ballRadius;
+    const by = cy + Math.sin(ballAngle) * ballRadius;
+    rCtx.beginPath();
+    rCtx.arc(bx, by, 6.5, 0, Math.PI * 2);
+    rCtx.fillStyle = '#ffffff';
+    rCtx.shadowColor = '#00f3ff';
+    rCtx.shadowBlur = 12;
+    rCtx.fill();
+    rCtx.shadowBlur = 0;
+  }
+
+  function spinRoulette() {
+    if (rouletteSpinning) return;
+    if (getRouletteTotalBet() === 0) {
+      placeRouletteChip('red');
+      if (getRouletteTotalBet() === 0) return;
+    }
+
+    rouletteSpinning = true;
+    elSpinBtn.disabled = true;
+    lastRouletteBets = { ...rouletteBets };
+
+    const totalStaked = getRouletteTotalBet();
+    jackpot += Math.ceil(totalStaked * 0.1);
+    totalPlinkoDrops++;
+    document.getElementById('statDrops').textContent = formatNum(totalPlinkoDrops);
+
+    const winIndex = Math.floor(Math.random() * 37);
+    const winNumber = ROULETTE_ORDER[winIndex];
+    const slice = (Math.PI * 2) / 37;
+
+    const startWheel = wheelAngle;
+    const targetWheel = startWheel + Math.PI * 6 + Math.random() * Math.PI * 2;
+    const finalSlotAngle = targetWheel + winIndex * slice;
+    const startBall = ballAngle;
+    const targetBall = finalSlotAngle - Math.PI * 10;
+
+    const startTime = performance.now();
+    const duration = 3100;
+    ballRadius = 118;
+
+    elStatus.textContent = "🎡 No more bets! Roulette wheel spinning...";
+
+    function animateWheel(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      const ease = 1 - Math.pow(1 - t, 3);
+
+      wheelAngle = startWheel + (targetWheel - startWheel) * ease;
+      ballAngle = startBall + (targetBall - startBall) * ease;
+
+      if (t > 0.65) {
+        const dropProgress = (t - 0.65) / 0.35;
+        ballRadius = 118 - dropProgress * 30 + Math.sin(dropProgress * Math.PI * 6) * (1 - dropProgress) * 5;
+      }
+      if (Math.random() < 0.35) playSound(300 + (1 - t) * 300, 'triangle', 0.025, 0.03);
+
+      drawRouletteWheel();
+
+      if (t < 1) {
+        requestAnimationFrame(animateWheel);
+      } else {
+        finishRouletteSpin(winNumber);
+      }
+    }
+    requestAnimationFrame(animateWheel);
+  }
+
+  function finishRouletteSpin(winNum) {
+    rouletteSpinning = false;
+    elSpinBtn.disabled = false;
+    rouletteHistory.unshift(winNum);
+    renderRouletteHistory();
+
+    const winCell = document.querySelector(`[data-bet="n${winNum}"]`);
+    if (winCell) winCell.classList.add('winner-glow');
+
+    let totalPayout = 0;
+    const col = getNumberColor(winNum);
+
+    Object.entries(rouletteBets).forEach(([betKey, stake]) => {
+      if (betKey === 'n' + winNum) totalPayout += stake * 36;
+      else if (betKey === 'red' && col === 'red') totalPayout += stake * 2;
+      else if (betKey === 'black' && col === 'black') totalPayout += stake * 2;
+      else if (betKey === 'even' && winNum !== 0 && winNum % 2 === 0) totalPayout += stake * 2;
+      else if (betKey === 'odd' && winNum !== 0 && winNum % 2 === 1) totalPayout += stake * 2;
+      else if (betKey === 'low' && winNum >= 1 && winNum <= 18) totalPayout += stake * 2;
+      else if (betKey === 'high' && winNum >= 19 && winNum <= 36) totalPayout += stake * 2;
+      else if (betKey === 'd1' && winNum >= 1 && winNum <= 12) totalPayout += stake * 3;
+      else if (betKey === 'd2' && winNum >= 13 && winNum <= 24) totalPayout += stake * 3;
+      else if (betKey === 'd3' && winNum >= 25 && winNum <= 36) totalPayout += stake * 3;
+    });
+
+    rouletteBets = {};
+    document.querySelectorAll('.chip-marker').forEach(el => el.remove());
+    document.getElementById('rouletteTotalBet').textContent = '0';
+
+    if (totalPayout > 0) {
+      addBalance(totalPayout);
+      lastWin = totalPayout;
+      elWin.textContent = formatNum(totalPayout);
+      checkBiggestWin(totalPayout, `Roulette #${winNum}`);
+      elStatus.textContent = `🎡 Ball landed on ${winNum} (${col.toUpperCase()})! YOU WON +$${formatNum(totalPayout)}!`;
+      playJackpotFanfare();
+      spawnParticles(80, true);
+      spawnFloatingText(`#${winNum} +$${formatNum(totalPayout)}`, window.innerWidth / 2, window.innerHeight / 2);
+    } else {
+      elStatus.textContent = `🎡 Ball landed on ${winNum} (${col.toUpperCase()}). Click REBET or place new chips!`;
+      playSound(190, 'sine', 0.15, 0.08);
+    }
+
+    saveGame();
+    updateUI();
+    broadcastPresence();
+  }
+
+  buildRouletteBoard();
+  drawRouletteWheel();
+
+  // ============================================================================
+  // 11. SCHOOL-FIREWALL-FRIENDLY MULTIPLAYER ENGINE (PORT 443 + WEBRTC MESH)
+  // ============================================================================
+  // Uses strictly standard HTTPS Port 443 / 8884 endpoints with reconnectPeriod: 0
+  // so blocked ports NEVER spam the console, and automatically links via PeerJS (Port 443).
+  const PORT_443_BROKERS = [
+    'wss://mqtt.eclipseprojects.io:443/mqtt',
+    'wss://broker.hivemq.com:8884/mqtt',
+    'wss://test.mosquitto.org:8081/mqtt'
+  ];
+  const GLOBAL_TOPIC = 'neon_royale_777_v36/global';
+  let mqttClient = null;
+  let subscribedRoomTopic = null;
+
+  const onlinePlayers = new Map();
+
+  // Local BroadcastChannel for instant 0ms multi-tab sync
+  const localBus = ('BroadcastChannel' in window) ? new BroadcastChannel('neon_royale_777_v36_bus') : null;
+  if (localBus) {
+    localBus.onmessage = (e) => {
+      if (e.data && e.data.topic === GLOBAL_TOPIC) handleGlobalPacket(e.data.payload);
+      else if (e.data && e.data.topic === subscribedRoomTopic) handleRoomPacket(e.data.payload);
+    };
+  }
+
+  function tryConnectPort443Broker(idx = 0) {
+    if (!window.mqtt || idx >= PORT_443_BROKERS.length) {
+      // Even if school firewall blocks all public MQTT brokers, PeerJS (Port 443) handles room + lobby P2P!
+      document.getElementById('netStatusDot').classList.add('connected');
+      document.getElementById('liveTickerText').textContent = `🛡️ School-WiFi Port-443 WebRTC Direct Mode Active! Host or Join any Room Code to play with friends!`;
+      updateOnlineCounter();
+      return;
+    }
+
+    const url = PORT_443_BROKERS[idx];
+    let connectedOnce = false;
+
+    try {
+      const client = window.mqtt.connect(url, {
+        clientId: 'nr777_' + clientId + '_' + Math.floor(Math.random() * 9999),
+        clean: true,
+        connectTimeout: 3500,
+        reconnectPeriod: 0 // CRITICAL: Prevents endless console error spam if school blocks a broker!
+      });
+
+      const failTimer = setTimeout(() => {
+        if (!connectedOnce) {
+          try { client.end(true); } catch (e) {}
+          tryConnectPort443Broker(idx + 1);
+        }
+      }, 3600);
+
+      client.on('connect', () => {
+        connectedOnce = true;
+        clearTimeout(failTimer);
+        mqttClient = client;
+        document.getElementById('netStatusDot').classList.add('connected');
+        mqttClient.subscribe(GLOBAL_TOPIC);
+        if (subscribedRoomTopic) mqttClient.subscribe(subscribedRoomTopic);
+        broadcastPresence();
+        updateOnlineCounter();
+        document.getElementById('liveTickerText').textContent = `🌍 Connected over Port 443 Relay! Global Leaderboard, Chat & Battle Rooms active.`;
+      });
+
+      client.on('message', (topic, messageBuffer) => {
+        try {
+          const data = JSON.parse(messageBuffer.toString());
+          if (topic === GLOBAL_TOPIC) handleGlobalPacket(data);
+          else if (topic === subscribedRoomTopic) handleRoomPacket(data);
+        } catch (err) {}
+      });
+
+      client.on('error', () => {
+        clearTimeout(failTimer);
+        try { client.end(true); } catch (e) {}
+        if (!connectedOnce) {
+          tryConnectPort443Broker(idx + 1);
+        }
+      });
+    } catch (e) {
+      tryConnectPort443Broker(idx + 1);
+    }
+  }
+
+  function publishGlobalPacket(payload) {
+    payload.senderId = clientId;
+    payload.ts = Date.now();
+    if (mqttClient && mqttClient.connected) {
+      mqttClient.publish(GLOBAL_TOPIC, JSON.stringify(payload));
+    }
+    if (localBus) {
+      localBus.postMessage({ topic: GLOBAL_TOPIC, payload });
+    }
+    // Also forward global packets over active WebRTC PeerJS connections so school peers see Chat/Leaderboard/Rain!
+    peerConnections.forEach(conn => {
+      if (conn && conn.open) {
+        try { conn.send({ _globalWrap: true, payload }); } catch (e) {}
+      }
+    });
+    if (hostConn && hostConn.open) {
+      try { hostConn.send({ _globalWrap: true, payload }); } catch (e) {}
+    }
+    handleGlobalPacket(payload, true);
+  }
+
+  const processedPacketIds = new Set();
+
+  function handleGlobalPacket(msg, isLocalEcho = false) {
+    if (!msg || !msg.type) return;
+    const pktKey = `${msg.senderId}_${msg.type}_${msg.ts}`;
+    if (processedPacketIds.has(pktKey)) return;
+    processedPacketIds.add(pktKey);
+    if (processedPacketIds.size > 300) {
+      const first = processedPacketIds.values().next().value;
+      processedPacketIds.delete(first);
+    }
+
+    if (msg.type === 'presence') {
+      const expectedSig = computeHash(`${msg.senderId}|${msg.balance}|${msg.mpWins || 0}`);
+      if (msg.sig !== expectedSig) return;
+      onlinePlayers.set(msg.senderId, {
+        id: msg.senderId,
+        name: String(msg.name || 'Player').slice(0, 15),
+        avatar: AVATARS.includes(msg.avatar) ? msg.avatar : '😎',
+        balance: Math.max(0, Math.floor(Number(msg.balance) || 0)),
+        mpWins: Math.max(0, Math.floor(Number(msg.mpWins) || 0)),
+        lastSeen: Date.now()
+      });
+      renderLeaderboard();
+      updateOnlineCounter();
+    } else if (msg.type === 'chat') {
+      if (isLocalEcho && msg.senderId === clientId && !msg.isSys) return;
+      addChatMessage(msg.user, msg.text, !!msg.isSys);
+    } else if (msg.type === 'ticker') {
+      document.getElementById('liveTickerText').textContent = msg.text;
+    } else if (msg.type === 'rain') {
+      if (msg.senderId !== clientId) {
+        const share = Math.max(50, Math.floor(Number(msg.share) || 250));
+        addBalance(share);
+        addChatMessage('🌧️ CASH RAIN', `${msg.avatar} ${msg.user} made it rain! You caught +$${formatNum(share)}!`, true);
+        spawnFloatingText(`🌧️ +$${formatNum(share)} RAIN!`, window.innerWidth / 2, window.innerHeight / 2);
+        playWinChord();
+        saveGame();
+        updateUI();
+      }
+    }
+  }
+
+  function broadcastPresence() {
+    const bal = getBalance();
+    const sig = computeHash(`${clientId}|${bal}|${mpWins}`);
+    publishGlobalPacket({
+      type: 'presence',
+      name: playerName,
+      avatar: playerAvatar,
+      balance: bal,
+      mpWins,
+      sig
+    });
+  }
+
+  function updateOnlineCounter() {
+    const now = Date.now();
+    for (const [id, info] of onlinePlayers.entries()) {
+      if (id !== clientId && now - info.lastSeen > 25000) {
+        onlinePlayers.delete(id);
+      }
+    }
+    const count = Math.max(1, onlinePlayers.size);
+    document.getElementById('onlineCountText').textContent = `${count} Real Player${count > 1 ? 's' : ''} Online`;
+  }
+
+  function renderLeaderboard() {
+    const listEl = document.getElementById('leaderboardList');
+    if (!listEl) return;
+
+    onlinePlayers.set(clientId, {
+      id: clientId,
+      name: playerName,
+      avatar: playerAvatar,
+      balance: getBalance(),
+      mpWins,
+      lastSeen: Date.now()
+    });
+
+    const sorted = Array.from(onlinePlayers.values()).sort((a, b) => b.balance - a.balance);
+    listEl.innerHTML = '';
+
+    sorted.forEach((entry, idx) => {
+      const isYou = entry.id === clientId;
+      const row = document.createElement('div');
+      row.className = `lb-row ${isYou ? 'you' : ''}`;
+      row.innerHTML = `
+        <span class="lb-rank">#${idx + 1}</span>
+        <span class="lb-name">${entry.avatar} ${entry.name} ${isYou ? '(YOU)' : ''}</span>
+        <span class="lb-val">$${formatNum(entry.balance)}</span>
+      `;
+      listEl.appendChild(row);
+    });
+  }
+
+  function addChatMessage(user, text, isSys = false) {
+    const box = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `chat-line ${isSys ? 'sys' : ''}`;
+    if (isSys) {
+      div.textContent = text;
+    } else {
+      const b = document.createElement('b');
+      b.textContent = user + ': ';
+      div.appendChild(b);
+      div.appendChild(document.createTextNode(text));
+    }
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+    while (box.children.length > 50) box.removeChild(box.firstChild);
+  }
+
+  document.getElementById('sendChatBtn').onclick = sendUserChat;
+  document.getElementById('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendUserChat();
+  });
+
+  function sendUserChat() {
+    const inp = document.getElementById('chatInput');
+    const txt = inp.value.trim();
+    if (!txt) return;
+    inp.value = '';
+    const label = `${playerAvatar} ${playerName}`;
+    addChatMessage(label, txt, false);
+    publishGlobalPacket({ type: 'chat', user: label, text: txt, isSys: false });
+    playSound(520, 'sine', 0.05, 0.06);
+  }
+
+  document.getElementById('makeItRainBtn').onclick = () => {
+    if (getBalance() < 1000) {
+      elStatus.textContent = "Need at least $1,000 to Make It Rain to online players!";
+      playSound(160, 'sawtooth', 0.2, 0.1);
+      return;
+    }
+    addBalance(-1000);
+    const othersCount = Math.max(1, onlinePlayers.size - 1);
+    const share = Math.max(100, Math.floor(1000 / othersCount));
+
+    publishGlobalPacket({
+      type: 'rain',
+      user: playerName,
+      avatar: playerAvatar,
+      share
+    });
+    publishGlobalPacket({
+      type: 'chat',
+      user: '🌧️ CASH RAIN',
+      text: `💸 ${playerAvatar} ${playerName} just MADE IT RAIN $1,000 across all online players!`,
+      isSys: true
+    });
+    publishGlobalPacket({
+      type: 'ticker',
+      text: `🌧️ ${playerAvatar} ${playerName} dropped a $1,000 Cash Rain in the global lobby!`
+    });
+    spawnParticles(70, true);
+    playWinChord();
+    saveGame();
+    updateUI();
+    broadcastPresence();
+  };
+
+  setInterval(() => {
+    broadcastPresence();
+    updateOnlineCounter();
+  }, 5000);
+
+  // ============================================================================
+  // 12. REAL MULTIPLAYER 10-SPIN SLOT BATTLES (PORT 443 PEERJS + MQTT)
+  // ============================================================================
+  let currentRoomCode = 'VIP777';
+  let currentRoomState = null;
+  let peerInstance = null;
+  let peerConnections = [];
+  let hostConn = null;
+  let paidBattleRoundId = null;
+
+  function sanitizeRoomCode(raw) {
+    return (raw || 'VIP777').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || 'VIP777';
+  }
+
+  function subscribeRoomChannel(code) {
+    const newTopic = `neon_royale_777_v36/room/${code}`;
+    if (mqttClient && mqttClient.connected) {
+      if (subscribedRoomTopic && subscribedRoomTopic !== newTopic) {
+        mqttClient.unsubscribe(subscribedRoomTopic);
+      }
+      mqttClient.subscribe(newTopic);
+    }
+    subscribedRoomTopic = newTopic;
+  }
+
+  function broadcastRoomPacket(packet) {
+    packet.roomCode = currentRoomCode;
+    packet.ts = Date.now();
+    packet.pktId = Math.random().toString(36).slice(2, 10);
+
+    if (mqttClient && mqttClient.connected && subscribedRoomTopic) {
+      mqttClient.publish(subscribedRoomTopic, JSON.stringify(packet));
+    }
+    if (localBus && subscribedRoomTopic) {
+      localBus.postMessage({ topic: subscribedRoomTopic, payload: packet });
+    }
+    peerConnections.forEach(conn => {
+      if (conn && conn.open) {
+        try { conn.send(packet); } catch (e) {}
+      }
+    });
+    if (hostConn && hostConn.open) {
+      try { hostConn.send(packet); } catch (e) {}
+    }
+    handleRoomPacket(packet);
+  }
+
+  function handleIncomingPeerData(data, sourceConn) {
+    if (!data) return;
+    if (data._globalWrap && data.payload) {
+      handleGlobalPacket(data.payload);
+      // Relay to other connected peers in the room
+      peerConnections.forEach(c => {
+        if (c !== sourceConn && c && c.open) {
+          try { c.send(data); } catch (e) {}
+        }
+      });
+      return;
+    }
+    handleRoomPacket(data);
+  }
+
+  function createOrHostRoom(code) {
+    if (currentRoomState && currentRoomState.running) return;
+    currentRoomCode = sanitizeRoomCode(code);
+    document.getElementById('roomCodeInput').value = currentRoomCode;
+    subscribeRoomChannel(currentRoomCode);
+
+    currentRoomState = {
+      roomCode: currentRoomCode,
+      hostId: clientId,
+      hostName: playerName,
+      spinStake: getBet(),
+      running: false,
+      round: 0,
+      battleId: null,
+      winnerName: null,
+      players: {
+        [clientId]: {
+          id: clientId,
+          name: playerName,
+          emoji: playerAvatar,
+          profit: 0,
+          cells: ['7️⃣', '7️⃣', '7️⃣'],
+          isBot: false
+        }
+      }
+    };
+
+    // PeerJS uses standard HTTPS Port 443 (0.peerjs.com:443) — works through school firewalls!
+    if (window.Peer) {
+      try {
+        if (peerInstance) peerInstance.destroy();
+        peerConnections = [];
+        peerInstance = new window.Peer(`nr777_v36_room_${currentRoomCode}`, {
+          host: '0.peerjs.com',
+          port: 443,
+          secure: true
+        });
+        peerInstance.on('open', () => {
+          document.getElementById('netStatusDot').classList.add('connected');
+        });
+        peerInstance.on('connection', (conn) => {
+          peerConnections.push(conn);
+          conn.on('data', (data) => handleIncomingPeerData(data, conn));
+          conn.on('open', () => {
+            if (currentRoomState) conn.send({ type: 'room_state', roomCode: currentRoomCode, state: currentRoomState });
+            broadcastPresence();
+          });
+        });
+        // If room ID is already hosted by someone else on the network, automatically join it!
+        peerInstance.on('error', (err) => {
+          if (err && err.type === 'unavailable-id') {
+            joinExistingRoom(currentRoomCode);
+          }
+        });
+      } catch (e) {}
+    }
+
+    broadcastRoomState();
+    renderBattleCards();
+    elStatus.textContent = `👑 Hosting Room [${currentRoomCode}] on Port 443! Tell friends to type "${currentRoomCode}" and click JOIN ROOM!`;
+    playSound(600, 'triangle', 0.12, 0.1);
+  }
+
+  function joinExistingRoom(code) {
+    if (currentRoomState && currentRoomState.running) return;
+    currentRoomCode = sanitizeRoomCode(code);
+    document.getElementById('roomCodeInput').value = currentRoomCode;
+    subscribeRoomChannel(currentRoomCode);
+
+    currentRoomState = {
+      roomCode: currentRoomCode,
+      hostId: null,
+      hostName: 'Connecting to Host...',
+      spinStake: getBet(),
+      running: false,
+      round: 0,
+      battleId: null,
+      winnerName: null,
+      players: {
+        [clientId]: {
+          id: clientId,
+          name: playerName,
+          emoji: playerAvatar,
+          profit: 0,
+          cells: ['7️⃣', '7️⃣', '7️⃣'],
+          isBot: false
+        }
+      }
+    };
+
+    if (window.Peer) {
+      try {
+        if (peerInstance) peerInstance.destroy();
+        peerInstance = new window.Peer({
+          host: '0.peerjs.com',
+          port: 443,
+          secure: true
+        });
+        peerInstance.on('open', () => {
+          document.getElementById('netStatusDot').classList.add('connected');
+          hostConn = peerInstance.connect(`nr777_v36_room_${currentRoomCode}`, { reliable: true });
+          hostConn.on('open', () => {
+            hostConn.send({
+              type: 'join_request',
+              roomCode: currentRoomCode,
+              player: { id: clientId, name: playerName, emoji: playerAvatar }
+            });
+            broadcastPresence();
+          });
+          hostConn.on('data', (data) => handleIncomingPeerData(data, hostConn));
+        });
+      } catch (e) {}
+    }
+
+    broadcastRoomPacket({
+      type: 'join_request',
+      player: { id: clientId, name: playerName, emoji: playerAvatar }
+    });
+
+    renderBattleCards();
+    elStatus.textContent = `🔗 Connecting to Room [${currentRoomCode}] via Port 443...`;
+    playSound(520, 'sine', 0.1, 0.1);
+  }
+
+  function broadcastRoomState() {
+    if (!currentRoomState || currentRoomState.hostId !== clientId) return;
+    broadcastRoomPacket({
+      type: 'room_state',
+      state: currentRoomState
+    });
+  }
+
+  const seenRoomPackets = new Set();
+
+  function handleRoomPacket(pkt) {
+    if (!pkt || pkt.roomCode !== currentRoomCode) return;
+    if (pkt.pktId) {
+      if (seenRoomPackets.has(pkt.pktId)) return;
+      seenRoomPackets.add(pkt.pktId);
+    }
+
+    if (pkt.type === 'join_request') {
+      if (!currentRoomState) return;
+      if (!currentRoomState.hostId) currentRoomState.hostId = clientId;
+      if (currentRoomState.hostId === clientId && !currentRoomState.running) {
+        const p = pkt.player;
+        if (p && p.id && (Object.keys(currentRoomState.players).length < 4 || currentRoomState.players[p.id])) {
+          currentRoomState.players[p.id] = {
+            id: p.id,
+            name: String(p.name || 'Player').slice(0, 15),
+            emoji: AVATARS.includes(p.emoji) ? p.emoji : '😎',
+            profit: 0,
+            cells: ['7️⃣', '7️⃣', '7️⃣'],
+            isBot: false
+          };
+          addChatMessage('⚔️ ROOM ' + currentRoomCode, `${p.emoji} ${p.name} joined the Slot Battle room!`, true);
+          playSound(660, 'triangle', 0.1, 0.09);
+          broadcastRoomState();
+        }
+      }
+    } else if (pkt.type === 'room_profile_update') {
+      if (currentRoomState && currentRoomState.players[pkt.senderId]) {
+        currentRoomState.players[pkt.senderId].name = pkt.name;
+        currentRoomState.players[pkt.senderId].emoji = pkt.emoji;
+        renderBattleCards();
+      }
+    } else if (pkt.type === 'room_state') {
+      const incoming = pkt.state;
+      if (!incoming) return;
+      currentRoomState = incoming;
+
+      if (!currentRoomState.players[clientId] && !currentRoomState.running && Object.keys(currentRoomState.players).length < 4) {
+        broadcastRoomPacket({
+          type: 'join_request',
+          player: { id: clientId, name: playerName, emoji: playerAvatar }
+        });
+      }
+
+      if (currentRoomState.running && currentRoomState.battleId && paidBattleRoundId !== currentRoomState.battleId) {
+        if (currentRoomState.players[clientId]) {
+          const buyIn = currentRoomState.spinStake * 10;
+          paidBattleRoundId = currentRoomState.battleId;
+          addBalance(-buyIn);
+          saveGame();
+          updateUI();
+        }
+      }
+
+      renderBattleCards();
+    } else if (pkt.type === 'battle_finished') {
+      currentRoomState = pkt.state;
+      renderBattleCards();
+      const winnerId = pkt.winnerId;
+      const pot = pkt.pot;
+      const winnerObj = currentRoomState.players[winnerId];
+
+      if (winnerId === clientId) {
+        addBalance(pot);
+        lastWin = pot;
+        mpWins++;
+        document.getElementById('statMpWins').textContent = formatNum(mpWins);
+        elWin.textContent = formatNum(pot);
+        checkBiggestWin(pot, `MP Slot Battle (${currentRoomCode})`);
+        elStatus.textContent = `👑 VICTORY! You profited the most across 10 spins and won the $${formatNum(pot)} Battle Pot!`;
+        playJackpotFanfare();
+        spawnParticles(140, true);
+        spawnFloatingText(`🏆 +$${formatNum(pot)}`, window.innerWidth / 2, window.innerHeight / 2);
+      } else if (winnerObj) {
+        elStatus.textContent = `🏆 ${winnerObj.emoji} ${winnerObj.name} won the 10-Spin Battle Pot ($${formatNum(pot)}) with ${winnerObj.profit >= 0 ? '+' : ''}$${formatNum(winnerObj.profit)} profit!`;
+        playSound(200, 'sawtooth', 0.25, 0.1);
+      }
+      saveGame();
+      updateUI();
+      broadcastPresence();
+    } else if (pkt.type === 'room_taunt') {
+      spawnFloatingText(`${pkt.name}: ${pkt.emo}`, window.innerWidth / 2, window.innerHeight / 2);
+      playSound(640, 'sine', 0.06, 0.07);
+    }
+  }
+
+  function renderBattleCards() {
+    const gridEl = document.getElementById('battlePlayersGrid');
+    if (!gridEl || !currentRoomState) return;
+    gridEl.innerHTML = '';
+
+    const playersArr = Object.values(currentRoomState.players);
+    const pCount = playersArr.length;
+    const buyIn = currentRoomState.spinStake * 10;
+    const pot = buyIn * pCount;
+
+    document.getElementById('battleSpinStakeText').textContent = formatNum(currentRoomState.spinStake);
+    document.getElementById('battleBuyInText').textContent = formatNum(buyIn);
+    document.getElementById('battlePotText').textContent = formatNum(pot);
+
+    const isHost = currentRoomState.hostId === clientId;
+    const startBtn = document.getElementById('startBattleBtn');
+    startBtn.disabled = currentRoomState.running || !isHost || pCount < 2;
+    startBtn.textContent = isHost
+      ? (pCount < 2 ? '⏳ NEED 2+ PLAYERS (OR +BOT)' : '⚔️ START 10-SPIN BATTLE!')
+      : `⏳ WAITING FOR HOST (${currentRoomState.hostName || 'Host'})`;
+
+    if (currentRoomState.running) {
+      document.getElementById('battleRoundText').textContent = `🔥 LIVE SPIN ${currentRoomState.round} / 10`;
+    } else if (currentRoomState.winnerName) {
+      document.getElementById('battleRoundText').textContent = `🏆 WINNER: ${currentRoomState.winnerName}`;
+    } else {
+      document.getElementById('battleRoundText').textContent = `ROOM ${currentRoomState.roomCode} (${pCount}/4 PLAYERS)`;
+    }
+
+    let maxProfit = playersArr.length ? Math.max(...playersArr.map(p => p.profit)) : 0;
+
+    for (let slot = 0; slot < 4; slot++) {
+      const p = playersArr[slot];
+      if (!p) {
+        const empty = document.createElement('div');
+        empty.className = 'mp-card empty-seat';
+        empty.innerHTML = `
+          <div style="font-size:24px;">🪑</div>
+          <div style="font-size:11px; font-weight:900; color:#a796d1;">OPEN PLAYER SEAT</div>
+          <div style="font-size:10px; color:#7c6ba1;">Join Room Code <b>${currentRoomState.roomCode}</b></div>
+        `;
+        gridEl.appendChild(empty);
+        continue;
+      }
+
+      const isYou = p.id === clientId;
+      const isLeader = currentRoomState.round > 0 && p.profit === maxProfit;
+      const card = document.createElement('div');
+      card.className = `mp-card ${isYou ? 'you' : ''} ${isLeader ? 'leader' : ''}`;
+      card.innerHTML = `
+        <div class="mp-header">
+          <span>${p.emoji} ${p.name} ${isYou ? '(YOU)' : ''}</span>
+          <span>${isLeader ? '👑 #1' : (p.id === currentRoomState.hostId ? '⭐ HOST' : '')}</span>
+        </div>
+        <div class="mp-mini-reels">
+          <div class="mp-mini-cell">${p.cells[0]}</div>
+          <div class="mp-mini-cell">${p.cells[1]}</div>
+          <div class="mp-mini-cell">${p.cells[2]}</div>
+        </div>
+        <div class="mp-stats">
+          <div class="mp-profit ${p.profit >= 0 ? 'pos' : 'neg'}">
+            ${p.profit >= 0 ? '+' : '-'}$${formatNum(Math.abs(p.profit))}
+          </div>
+        </div>
+      `;
+      gridEl.appendChild(card);
+    }
+  }
+
+  document.getElementById('hostRoomBtn').onclick = () => {
+    const code = document.getElementById('roomCodeInput').value;
+    createOrHostRoom(code);
+  };
+
+  document.getElementById('joinRoomBtn').onclick = () => {
+    const code = document.getElementById('roomCodeInput').value;
+    joinExistingRoom(code);
+  };
+
+  document.getElementById('addBotBtn').onclick = () => {
+    if (!currentRoomState || currentRoomState.running) return;
+    if (currentRoomState.hostId !== clientId) {
+      elStatus.textContent = "Only the Room Host can add an AI Bot seat!";
+      return;
+    }
+    const pKeys = Object.keys(currentRoomState.players);
+    if (pKeys.length >= 4) {
+      elStatus.textContent = "Room is already full (4/4 players)!";
+      return;
+    }
+    const botNames = [
+      { name: 'CyberBot_AI', emoji: '🤖' },
+      { name: 'VegasDroid', emoji: '⚡' },
+      { name: 'NeonSynth', emoji: '👾' }
+    ];
+    const pick = botNames[pKeys.length % botNames.length];
+    const botId = 'bot_' + Math.random().toString(36).slice(2, 7);
+    currentRoomState.players[botId] = {
+      id: botId,
+      name: pick.name,
+      emoji: pick.emoji,
+      profit: 0,
+      cells: ['💎', '7️⃣', '💎'],
+      isBot: true
+    };
+    broadcastRoomState();
+    playSound(520, 'sine', 0.08, 0.08);
+  };
+
+  document.getElementById('startBattleBtn').onclick = startMultiplayerSlotBattle;
+
+  function startMultiplayerSlotBattle() {
+    if (!currentRoomState || currentRoomState.running) return;
+    if (currentRoomState.hostId !== clientId) {
+      elStatus.textContent = "Waiting for the Room Host to start the 10-Spin Battle!";
+      return;
+    }
+    const pCount = Object.keys(currentRoomState.players).length;
+    if (pCount < 2) {
+      elStatus.textContent = "Need at least 2 players in the room (invite a friend or click +AI BOT)!";
+      playSound(180, 'sawtooth', 0.2, 0.1);
+      return;
+    }
+
+    const spinStake = getBet();
+    const buyIn = spinStake * 10;
+    if (getBalance() < buyIn) {
+      elStatus.textContent = `Need $${formatNum(buyIn)} (10x $${formatNum(spinStake)}) to launch this Battle!`;
+      playSound(160, 'sawtooth', 0.25, 0.12);
+      return;
+    }
+
+    currentRoomState.spinStake = spinStake;
+    currentRoomState.running = true;
+    currentRoomState.round = 0;
+    currentRoomState.winnerName = null;
+    currentRoomState.battleId = 'b_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+
+    Object.values(currentRoomState.players).forEach(p => {
+      p.profit = 0;
+      p.cells = ['🎰', '🎰', '🎰'];
+    });
+
+    broadcastRoomState();
+    publishGlobalPacket({
+      type: 'chat',
+      user: '⚔️ BATTLE ARENA',
+      text: `Room [${currentRoomCode}] started a 10-Spin Slot Battle for a $${formatNum(buyIn * pCount)} Pot!`,
+      isSys: true
+    });
+
+    runHostBattleRoundLoop();
+  }
+
+  function simulateMiniSlotSpin(spinStake) {
+    const c = [pickRandomSymbol(), pickRandomSymbol(), pickRandomSymbol()];
+    const res = evaluateLine(c, spinStake / 5);
+    const payout = Math.round(res.payout);
+    return { cells: c, net: payout - spinStake };
+  }
+
+  function runHostBattleRoundLoop() {
+    if (!currentRoomState || currentRoomState.hostId !== clientId) return;
+
+    if (currentRoomState.round >= 10) {
+      const playersArr = Object.values(currentRoomState.players).sort((a, b) => b.profit - a.profit);
+      const winner = playersArr[0];
+      const pot = currentRoomState.spinStake * 10 * playersArr.length;
+
+      currentRoomState.running = false;
+      currentRoomState.winnerName = `${winner.emoji} ${winner.name}`;
+
+      broadcastRoomPacket({
+        type: 'battle_finished',
+        state: currentRoomState,
+        winnerId: winner.id,
+        pot
+      });
+      return;
+    }
+
+    currentRoomState.round++;
+    Object.values(currentRoomState.players).forEach(p => {
+      const outcome = simulateMiniSlotSpin(currentRoomState.spinStake);
+      p.cells = outcome.cells;
+      p.profit += outcome.net;
+    });
+
+    broadcastRoomState();
+    playSound(420 + currentRoomState.round * 25, 'triangle', 0.08, 0.08);
+    setTimeout(runHostBattleRoundLoop, 650);
+  }
+
+  document.querySelectorAll('.btn-emoji').forEach(btn => {
+    btn.onclick = () => {
+      const emo = btn.dataset.emo;
+      broadcastRoomPacket({
+        type: 'room_taunt',
+        name: `${playerAvatar} ${playerName}`,
+        emo
+      });
+    };
+  });
+
+  // ============================================================================
+  // 13. DOUBLE OR NOTHING GAMBLE & ACTION DISPATCHER
+  // ============================================================================
   const elModal = document.getElementById('gambleModal');
   const elGamblePot = document.getElementById('gamblePot');
   const elGambleCard = document.getElementById('gambleCard');
@@ -1484,7 +3203,7 @@
   elGambleBtn.onclick = () => {
     if (spinning || lastWin <= 0) return;
     gambleAmount = lastWin;
-    balance -= gambleAmount;
+    addBalance(-gambleAmount);
     saveGame();
     elGambleBtn.style.display = 'none';
     elGamblePot.textContent = formatNum(gambleAmount);
@@ -1496,11 +3215,7 @@
 
   function resolveGamble(choiceRed) {
     const isRed = Math.random() < 0.5;
-    const redSuits = ['♥️', '♦️'];
-    const blackSuits = ['♠️', '♣️'];
-    const suit = isRed
-      ? redSuits[Math.floor(Math.random() * 2)]
-      : blackSuits[Math.floor(Math.random() * 2)];
+    const suit = isRed ? (Math.random() < 0.5 ? '♥️' : '♦️') : (Math.random() < 0.5 ? '♠️' : '♣️');
 
     elGambleCard.style.transform = 'rotateY(90deg)';
     setTimeout(() => {
@@ -1510,10 +3225,7 @@
 
       if (choiceRed === isRed) {
         gambleAmount *= 2;
-        if (gambleAmount > biggestWin) {
-          biggestWin = gambleAmount;
-          document.getElementById('statBest').textContent = '$' + formatNum(biggestWin);
-        }
+        checkBiggestWin(gambleAmount, '2x Gamble');
         elGamblePot.textContent = formatNum(gambleAmount);
         playWinChord();
         spawnParticles(50, true);
@@ -1535,7 +3247,7 @@
   document.getElementById('pickBlack').onclick = () => { if (gambleAmount > 0) resolveGamble(false); };
   document.getElementById('collectBtn').onclick = () => {
     if (gambleAmount > 0) {
-      balance += gambleAmount;
+      addBalance(gambleAmount);
       elWin.textContent = formatNum(gambleAmount);
       elStatus.textContent = `💰 Collected $${formatNum(gambleAmount)} from Gamble!`;
       spawnFloatingText(`+$${formatNum(gambleAmount)}`, window.innerWidth / 2, window.innerHeight / 2);
@@ -1544,7 +3256,15 @@
     elModal.classList.remove('open');
     saveGame();
     updateUI();
+    broadcastPresence();
   };
+
+  function triggerMainAction() {
+    if (activeGame === 'slots') spin();
+    else if (activeGame === 'plinko') dropPlinkoBall();
+    else if (activeGame === 'roulette') spinRoulette();
+    else if (activeGame === 'battle') startMultiplayerSlotBattle();
+  }
 
   elAutoBtn.onclick = () => {
     autoPlay = !autoPlay;
@@ -1563,13 +3283,17 @@
 
   elSpinBtn.onclick = triggerMainAction;
   window.addEventListener('keydown', e => {
-    if (document.activeElement === elCustomBetInput) return;
-    if (e.code === 'Space' && !elModal.classList.contains('open') && !elChangelogModal.classList.contains('open')) {
+    const tag = document.activeElement ? document.activeElement.tagName : '';
+    if (tag === 'INPUT') return;
+    if (e.code === 'Space' && !elModal.classList.contains('open') && !elProfileModal.classList.contains('open') && !elAnticheatModal.classList.contains('open')) {
       e.preventDefault();
       triggerMainAction();
     }
   });
 
+  // ============================================================================
+  // 14. PARTICLE FX & FANFARES
+  // ============================================================================
   function playWinChord() {
     [523.25, 659.25, 783.99, 1046.5].forEach((n, i) => {
       setTimeout(() => playSound(n, 'sine', 0.22, 0.12), i * 75);
@@ -1641,11 +3365,21 @@
     requestAnimationFrame(renderParticles);
   }
 
+  // Initialize Everything
   loadGame();
-  checkChangelogOnce();
+  syncProfileUI();
+  tryConnectPort443Broker(0);
+  createOrHostRoom('VIP777');
+  addChatMessage('🌍 SYSTEM', 'v3.6 Port-443 School-Friendly Multiplayer Active! No more :8084 errors.', true);
+
+  if (!localStorage.getItem(PROFILE_SET_KEY)) {
+    openProfileModal();
+  }
+
   animateBalance();
   renderParticles();
   updateUI();
+})();
 </script>
 </body>
 </html>
