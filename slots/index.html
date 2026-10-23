@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON ROYALE 777 - v3.6 PORT-443 MULTIPLAYER EDITION</title>
+<title>NEON ROYALE 777 - v3.8 VERIFIED VAULT EDITION</title>
 <!-- Real Multiplayer Networking Libraries (Port 443 Compatible) -->
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script src="https://unpkg.com/mqtt@5.3.4/dist/mqtt.min.js"></script>
@@ -395,18 +395,19 @@
   .room-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .room-input {
     background: #1a0f3b; border: 1px solid var(--cyan); color: #fff;
-    padding: 6px 10px; border-radius: 7px; font-size: 12px; font-weight: 900; width: 110px;
+    padding: 6px 10px; border-radius: 7px; font-size: 12px; font-weight: 900; width: 100px;
     text-transform: uppercase; user-select: text;
   }
   .btn-mp {
     background: linear-gradient(135deg, var(--cyan), #0077ff);
     border: none; color: #000; font-weight: 900; font-size: 11px;
-    padding: 6px 11px; border-radius: 7px; cursor: pointer; transition: all 0.15s;
+    padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s;
     white-space: nowrap;
   }
   .btn-mp.purple { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; }
   .btn-mp.gold { background: linear-gradient(135deg, var(--gold), #ff8800); color: #000; }
   .btn-mp.green { background: linear-gradient(135deg, #00e676, #00bfa5); color: #000; }
+  .btn-mp.red { background: linear-gradient(135deg, #ff1744, #b71c1c); color: #fff; }
   .btn-mp:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
   .btn-mp:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -743,7 +744,7 @@
 <!-- LIVE REAL-TIME GLOBAL BROADCAST TICKER -->
 <div class="global-ticker">
   <span class="ticker-badge">🌍 PORT-443 LIVE FEED</span>
-  <div class="ticker-content" id="liveTickerText">Connecting via Port 443 School-Friendly Multiplayer Relay...</div>
+  <div class="ticker-content" id="liveTickerText">v3.8 Active: Verified Save-History Recovery + Safe Multiplayer Room Protection!</div>
   <div class="online-pill">
     <span class="online-dot" id="netStatusDot"></span>
     <span id="onlineCountText">Connecting...</span>
@@ -767,7 +768,7 @@
           <span id="topUserName">Player</span>
           <span style="font-size:9px; color:var(--cyan);">✏️</span>
         </button>
-        <button class="shield-badge" id="openAnticheatBtn" title="Aegis Vault Anticheat Audit">🛡️ AEGIS</button>
+        <button class="shield-badge" id="openAnticheatBtn" title="Aegis Vault Anticheat & Verified Recovery">🛡️ AEGIS</button>
         <div class="vip-badge" id="vipBadge">VIP TIER I</div>
       </div>
     </div>
@@ -884,25 +885,29 @@
       <div class="battle-stage">
         <div class="battle-top-bar">
           <div class="room-controls">
-            <span style="font-size:11px; font-weight:900; color:var(--cyan);">ROOM CODE:</span>
+            <span style="font-size:11px; font-weight:900; color:var(--cyan);">ROOM:</span>
             <input type="text" id="roomCodeInput" class="room-input" value="VIP777" maxlength="10" />
             <button class="btn-mp green" id="hostRoomBtn">👑 HOST ROOM</button>
             <button class="btn-mp" id="joinRoomBtn">🔗 JOIN ROOM</button>
-            <button class="btn-mp purple" id="addBotBtn" title="Optional: Add an AI bot if waiting for human players">🤖 +AI BOT</button>
+            <button class="btn-mp red" id="leaveRoomBtn" disabled>🚪 LEAVE</button>
+            <button class="btn-mp purple" id="addBotBtn" disabled title="Optional: Add an AI bot if waiting for human players">🤖 +BOT</button>
           </div>
-          <button class="btn-mp gold" id="startBattleBtn">⚔️ START 10-SPIN BATTLE!</button>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-mp green" id="readyBattleBtn" disabled>✅ READY UP</button>
+            <button class="btn-mp gold" id="startBattleBtn" disabled>⚔️ START 10-SPIN BATTLE!</button>
+          </div>
         </div>
 
         <div class="battle-hud-strip">
-          <span>STATUS: <b style="color:var(--cyan);" id="battleRoundText">LOBBY • ROOM VIP777</b></span>
+          <span>STATUS: <b style="color:var(--cyan);" id="battleRoundText">NOT IN A ROOM (SAFE)</b></span>
           <span>STAKE PER SPIN: <b style="color:#fff;">$<span id="battleSpinStakeText">50</span></b> (10x = $<span id="battleBuyInText">500</span>)</span>
-          <span>🏆 LIVE POT: <b style="color:var(--gold); font-size:14px;">$<span id="battlePotText">500</span></b></span>
+          <span>🏆 LIVE POT: <b style="color:var(--gold); font-size:14px;">$<span id="battlePotText">0</span></b></span>
         </div>
 
         <div class="battle-players-grid" id="battlePlayersGrid"></div>
 
         <div class="taunt-bar">
-          <span style="font-size:11px; color:#a796d1; font-weight:800;">⚡ Works on School Wi-Fi via Port 443 WebRTC! Highest 10-Spin Profit wins the Pot:</span>
+          <span style="font-size:11px; color:#a796d1; font-weight:800;">🛡️ Safe Lobby Protection: Switching tabs automatically leaves the room so nobody can start a match with your money!</span>
           <div class="emoji-btns">
             <button class="btn-emoji" data-emo="🔥">🔥</button>
             <button class="btn-emoji" data-emo="💎">💎</button>
@@ -938,7 +943,7 @@
       <button class="btn-auto" id="autoBtn">AUTO</button>
     </div>
 
-    <div class="status-msg" id="statusMsg">🌍 Port-443 School-Friendly Multiplayer Active • Click your name at the top right to customize your profile!</div>
+    <div class="status-msg" id="statusMsg">🛡️ v3.8 Active: Automatic Save-History Verification & Safe Multiplayer Rooms!</div>
   </div>
 
   <!-- SIDE PANEL: REAL MULTIPLAYER LEADERBOARD, LIVE CHAT & PAYTABLE -->
@@ -1018,7 +1023,7 @@
 
     <div class="save-footer">
       <button class="bailout-btn" id="bailoutBtn">🆘 BROKE! CLAIM $5000 BAILOUT</button>
-      <div class="save-status" id="saveStatus">🛡️ Aegis Signed Auto-Save Active</div>
+      <div class="save-status" id="saveStatus">🛡️ Aegis 64-Bit Signed Save Active</div>
       <div class="footer-btns">
         <button class="changelog-side-btn" id="openProfileFooterBtn">👤 Edit Username</button>
         <button class="reset-btn" id="resetSaveBtn">🗑️ Reset Save</button>
@@ -1054,16 +1059,18 @@
   </div>
 </div>
 
-<!-- AEGIS ANTICHEAT SECURITY MODAL -->
+<!-- AEGIS ANTICHEAT SECURITY & VERIFIED RECOVERY MODAL -->
 <div class="modal-backdrop" id="anticheatModal">
   <div class="changelog-box">
-    <h2 class="changelog-title">🛡️ AEGIS VAULT™ ANTICHEAT ENGINE</h2>
-    <div class="changelog-sub">Real-time memory encapsulation, console honeypots & cryptographic save signing</div>
+    <h2 class="changelog-title">🛡️ AEGIS VAULT™ 64-BIT SECURITY</h2>
+    <div class="changelog-sub">Automatic Save-History Verification & Cryptographic Recovery</div>
     <div class="changelog-list">
-      <div class="changelog-item">🔒 <b>Closure-Isolated Memory Vault:</b> Your bankroll is stored inside an inaccessible private closure with randomized XOR shadow checksums—console commands (`balance = 999999`) cannot touch real funds.</div>
-      <div class="changelog-item">🚨 <b>Global Honeypot Traps:</b> Attempting to modify `window.balance` or `window.jackpot` via DevTools triggers an immediate intrusion alarm.</div>
-      <div class="changelog-item">✍️ <b>Signed Save & Packet Verification:</b> Every `localStorage` save and multiplayer leaderboard packet is signed with a salted hash.</div>
-      <div class="changelog-item">👁️ <b>DOM Mutation Sentinel:</b> Editing `#balanceDisplay` via Inspect Element is immediately reverted.</div>
+      <div class="changelog-item">🔍 <b>Automatic Save-History Verification:</b> On load, Aegis inspects your signed `biggestWin`, `currentBet`, and spin history. If your save proves you reached high-roller status before the v3.6 32-bit reset, it restores your bankroll automatically!</div>
+      <div class="changelog-item">🔑 <b>One-Time Admin Recovery Key:</b> If your friend needs manual restoration, enter the private one-time recovery key below:</div>
+      <div style="display:flex; gap:6px; margin-top:4px;">
+        <input type="password" id="recoveryCodeInput" class="chat-input" placeholder="Enter private recovery key..." />
+        <button class="btn-mp gold" id="redeemRecoveryBtn">🔓 VERIFY & RESTORE</button>
+      </div>
       <div class="changelog-item">📊 <b>Security Audit Log:</b> <span id="acLogStatus" style="color:var(--green); font-weight:900;">0 Intrusion Attempts Blocked</span></div>
     </div>
     <div style="display:flex; gap:8px;">
@@ -1078,14 +1085,16 @@
   "use strict";
 
   // ============================================================================
-  // 1. AEGIS VAULT™ ANTICHEAT & CRYPTOGRAPHIC INTEGRITY ENGINE
+  // 1. AEGIS VAULT™ 64-BIT ANTICHEAT (NO 32-BIT XOR OVERFLOW AT $2.14 BILLION!)
   // ============================================================================
   const SAVE_KEY = 'neon_royale_777_save_v1';
   const PROFILE_SET_KEY = 'neon_royale_777_profile_configured_v35';
-  const SECRET_SALT = 'AEGIS_NEON_ROYALE_777_V35_SALT_99481';
+  const RECOVERY_CLAIMED_KEY = 'neon_royale_777_overflow_recovered_v38';
+  const SECRET_SALT = 'AEGIS_NEON_ROYALE_777_V37_SALT_99481';
+  const MAX_SAFE_BANKROLL = 900000000000000; // 900 Trillion (64-bit safe)
 
-  let sessionKey = (Math.random() * 0x7fffffff) | 0;
-  let _maskedBalance = 5000 ^ sessionKey;
+  let sessionOffset = Math.floor(Math.random() * 9000000) + 1337;
+  let _vaultValue = 5000 * 7 + sessionOffset;
   let _shadowHash = computeHash(5000);
   let cheatStrikes = 0;
 
@@ -1108,7 +1117,7 @@
   }
 
   function getBalance() {
-    const raw = _maskedBalance ^ sessionKey;
+    const raw = Math.round((_vaultValue - sessionOffset) / 7);
     if (computeHash(raw) !== _shadowHash) {
       flagCheatAttempt("Memory Checksum Mismatch");
       setBalance(5000);
@@ -1118,9 +1127,11 @@
   }
 
   function setBalance(newVal) {
-    const clean = Math.max(0, Math.floor(Number(newVal) || 0));
-    sessionKey = (Math.random() * 0x7fffffff) | 0;
-    _maskedBalance = clean ^ sessionKey;
+    let num = Number(newVal);
+    if (!Number.isFinite(num) || isNaN(num) || num < 0) num = 0;
+    const clean = Math.min(MAX_SAFE_BANKROLL, Math.max(0, Math.floor(num)));
+    sessionOffset = Math.floor(Math.random() * 9000000) + 1337;
+    _vaultValue = clean * 7 + sessionOffset;
     _shadowHash = computeHash(clean);
     return clean;
   }
@@ -1160,7 +1171,7 @@
     try {
       Object.defineProperty(window, prop, {
         configurable: false,
-        get() { return "🛡️ Protected by Aegis Vault™"; },
+        get() { return "🛡️ Protected by Aegis 64-Bit Vault™"; },
         set(v) { flagCheatAttempt(`Console window.${prop} = ${v}`); }
       });
     } catch (e) {}
@@ -1327,7 +1338,7 @@
   });
 
   // ============================================================================
-  // 4. SAVE & LOAD WITH AEGIS SIGNATURE MIGRATION
+  // 4. SAVE, LOAD & AUTOMATIC 32-BIT OVERFLOW SAVE-HISTORY VERIFICATION
   // ============================================================================
   function saveGame() {
     try {
@@ -1345,11 +1356,11 @@
         feverSpinsLeft,
         plinkoRisk,
         grid,
-        v: 3
+        v: 37
       };
       data.aegis_sig = computePayloadSignature(data);
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-      elSaveStatus.textContent = '🛡️ Aegis Signed Save Active';
+      elSaveStatus.textContent = '🛡️ Aegis 64-Bit Signed Save Active';
     } catch (e) {}
   }
 
@@ -1359,7 +1370,7 @@
       if (!raw) return;
       const data = JSON.parse(raw);
 
-      if (data.v === 3) {
+      if (data.v === 37 || data.v === 3) {
         const expectedSig = computePayloadSignature(data);
         if (data.aegis_sig !== expectedSig) {
           flagCheatAttempt("Forged LocalStorage Save Signature");
@@ -1390,6 +1401,23 @@
       if (typeof data.feverSpinsLeft === 'number') feverSpinsLeft = data.feverSpinsLeft;
       if (data.plinkoRisk && PLINKO_MULTIPLIERS[data.plinkoRisk]) plinkoRisk = data.plinkoRisk;
       if (Array.isArray(data.grid) && data.grid.length === 3) grid = data.grid;
+
+      // AUTOMATIC SAVE-HISTORY VERIFICATION FOR THE 32-BIT OVERFLOW BUG:
+      // If a player's signed save has high-roller proof (biggestWin >= $5M or currentBet >= $1M)
+      // AND their balance was crushed back down near $5,000 by the v3.6 32-bit overflow,
+      // automatically restore their bankroll once!
+      const alreadyRecovered = localStorage.getItem(RECOVERY_CLAIMED_KEY);
+      if (!alreadyRecovered && getBalance() < 1000000 && (biggestWin >= 5000000 || currentBet >= 1000000)) {
+        const restoredAmount = Math.max(1000000000, Math.floor(biggestWin * 2));
+        setBalance(restoredAmount);
+        displayedBalance = restoredAmount;
+        localStorage.setItem(RECOVERY_CLAIMED_KEY, 'auto_verified');
+        setTimeout(() => {
+          elStatus.textContent = `🛡️ AEGIS AUTO-RECOVERY: Verified your high-roller save history (Biggest Win: $${formatNum(biggestWin)}) & restored $${formatNum(restoredAmount)}!`;
+          playJackpotFanfare();
+          spawnParticles(120, true);
+        }, 600);
+      }
 
       for (let c = 0; c < 3; c++) {
         for (let r = 0; r < 3; r++) {
@@ -1444,15 +1472,19 @@
   }
 
   function formatNum(n) {
-    return Math.floor(n).toLocaleString('en-US');
+    return Math.floor(Number(n) || 0).toLocaleString('en-US');
   }
 
   function animateBalance() {
     const realBal = getBalance();
     if (displayedBalance !== realBal) {
       const diff = realBal - displayedBalance;
-      const step = Math.ceil(Math.abs(diff) * 0.18);
-      displayedBalance += diff > 0 ? step : -step;
+      const step = Math.max(1, Math.ceil(Math.abs(diff) * 0.22));
+      if (Math.abs(diff) <= step) {
+        displayedBalance = realBal;
+      } else {
+        displayedBalance += diff > 0 ? step : -step;
+      }
       internalDomUpdate = true;
       elBalance.textContent = formatNum(displayedBalance);
       internalDomUpdate = false;
@@ -1490,7 +1522,8 @@
     }
 
     const vip = document.getElementById('vipBadge');
-    if (bal >= 1000000) vip.textContent = '🌌 LEVIATHAN';
+    if (bal >= 1000000000) vip.textContent = '🪐 BILLIONAIRE';
+    else if (bal >= 1000000) vip.textContent = '🌌 LEVIATHAN';
     else if (bal >= 100000) vip.textContent = '👑 WHALE VIP';
     else if (bal >= 25000) vip.textContent = '💎 HIGH ROLLER';
     else vip.textContent = 'VIP TIER I';
@@ -1506,7 +1539,7 @@
   }
 
   // ============================================================================
-  // 6. NAVIGATION TABS
+  // 6. NAVIGATION TABS (AUTO-LEAVES MP ROOM IF SWITCHING AWAY FROM BATTLE!)
   // ============================================================================
   document.getElementById('tabSlots').onclick = () => switchGameMode('slots');
   document.getElementById('tabPlinko').onclick = () => switchGameMode('plinko');
@@ -1515,6 +1548,11 @@
 
   function switchGameMode(mode) {
     if (spinning || rouletteSpinning || (currentRoomState && currentRoomState.running)) return;
+
+    if (activeGame === 'battle' && mode !== 'battle' && currentRoomState) {
+      leaveCurrentRoom(true);
+    }
+
     activeGame = mode;
     autoPlay = false;
     elAutoBtn.classList.remove('active');
@@ -1565,7 +1603,7 @@
   });
 
   // ============================================================================
-  // 7. BETTING CONTROLS & ANTICHEAT MODAL
+  // 7. BETTING CONTROLS & VERIFIED RECOVERY KEY CHECK
   // ============================================================================
   function setCustomBet(amount, syncInput = true) {
     if (spinning || rouletteSpinning || (currentRoomState && currentRoomState.running)) return;
@@ -1575,6 +1613,9 @@
     if (syncInput) elCustomBetInput.value = currentBet;
     if (currentRoomState && currentRoomState.hostId === clientId && !currentRoomState.running) {
       currentRoomState.spinStake = currentBet;
+      Object.values(currentRoomState.players).forEach(p => {
+        if (!p.isBot && p.id !== clientId) p.ready = false;
+      });
       broadcastRoomState();
     }
     saveGame();
@@ -1659,6 +1700,37 @@
   document.getElementById('openAnticheatBtn').onclick = () => elAnticheatModal.classList.add('open');
   document.getElementById('closeAnticheatBtn').onclick = () => elAnticheatModal.classList.remove('open');
   document.getElementById('testHackBtn').onclick = () => { window.balance = 999999999; };
+
+  // Cryptographically hashed one-time recovery key check (Code: OVERFLOW-1B-VIP)
+  const EXPECTED_RECOVERY_HASH = computeHash("KEY_VERIFY:OVERFLOW-1B-VIP");
+  document.getElementById('redeemRecoveryBtn').onclick = () => {
+    const inp = document.getElementById('recoveryCodeInput');
+    const entered = (inp.value || '').trim().toUpperCase();
+    if (localStorage.getItem(RECOVERY_CLAIMED_KEY)) {
+      elStatus.textContent = "⚠️ Overflow recovery has already been claimed on this device!";
+      playSound(180, 'sawtooth', 0.2, 0.1);
+      return;
+    }
+    if (computeHash("KEY_VERIFY:" + entered) !== EXPECTED_RECOVERY_HASH) {
+      elStatus.textContent = "❌ Invalid recovery key! Only verified overflow keys are accepted.";
+      playSound(160, 'sawtooth', 0.25, 0.12);
+      return;
+    }
+    inp.value = '';
+    localStorage.setItem(RECOVERY_CLAIMED_KEY, 'key_verified');
+    addBalance(1000000000);
+    if (biggestWin < 1000000000) {
+      biggestWin = 1000000000;
+      document.getElementById('statBest').textContent = '$' + formatNum(biggestWin);
+    }
+    saveGame();
+    updateUI();
+    broadcastPresence();
+    playJackpotFanfare();
+    spawnParticles(120, true);
+    elAnticheatModal.classList.remove('open');
+    elStatus.textContent = "✅ Recovery Key Verified! Restored $1,000,000,000 to Protected Bankroll!";
+  };
 
   // ============================================================================
   // 8. GAME 1: 777 SLOTS ENGINE
@@ -2437,21 +2509,18 @@
   // ============================================================================
   // 11. SCHOOL-FIREWALL-FRIENDLY MULTIPLAYER ENGINE (PORT 443 + WEBRTC MESH)
   // ============================================================================
-  // Uses strictly standard HTTPS Port 443 / 8884 endpoints with reconnectPeriod: 0
-  // so blocked ports NEVER spam the console, and automatically links via PeerJS (Port 443).
   const PORT_443_BROKERS = [
     'wss://mqtt.eclipseprojects.io:443/mqtt',
     'wss://broker.hivemq.com:8884/mqtt',
     'wss://test.mosquitto.org:8081/mqtt'
   ];
-  const GLOBAL_TOPIC = 'neon_royale_777_v36/global';
+  const GLOBAL_TOPIC = 'neon_royale_777_v38/global';
   let mqttClient = null;
   let subscribedRoomTopic = null;
 
   const onlinePlayers = new Map();
 
-  // Local BroadcastChannel for instant 0ms multi-tab sync
-  const localBus = ('BroadcastChannel' in window) ? new BroadcastChannel('neon_royale_777_v36_bus') : null;
+  const localBus = ('BroadcastChannel' in window) ? new BroadcastChannel('neon_royale_777_v38_bus') : null;
   if (localBus) {
     localBus.onmessage = (e) => {
       if (e.data && e.data.topic === GLOBAL_TOPIC) handleGlobalPacket(e.data.payload);
@@ -2461,9 +2530,8 @@
 
   function tryConnectPort443Broker(idx = 0) {
     if (!window.mqtt || idx >= PORT_443_BROKERS.length) {
-      // Even if school firewall blocks all public MQTT brokers, PeerJS (Port 443) handles room + lobby P2P!
       document.getElementById('netStatusDot').classList.add('connected');
-      document.getElementById('liveTickerText').textContent = `🛡️ School-WiFi Port-443 WebRTC Direct Mode Active! Host or Join any Room Code to play with friends!`;
+      document.getElementById('liveTickerText').textContent = `🛡️ Port-443 WebRTC Direct Mode Active! Host or Join a Room Code in the MP Battle tab to play with friends!`;
       updateOnlineCounter();
       return;
     }
@@ -2476,7 +2544,7 @@
         clientId: 'nr777_' + clientId + '_' + Math.floor(Math.random() * 9999),
         clean: true,
         connectTimeout: 3500,
-        reconnectPeriod: 0 // CRITICAL: Prevents endless console error spam if school blocks a broker!
+        reconnectPeriod: 0
       });
 
       const failTimer = setTimeout(() => {
@@ -2495,7 +2563,7 @@
         if (subscribedRoomTopic) mqttClient.subscribe(subscribedRoomTopic);
         broadcastPresence();
         updateOnlineCounter();
-        document.getElementById('liveTickerText').textContent = `🌍 Connected over Port 443 Relay! Global Leaderboard, Chat & Battle Rooms active.`;
+        document.getElementById('liveTickerText').textContent = `🌍 Connected over Port 443 Relay! Global Leaderboard, Chat & Safe Battle Rooms active.`;
       });
 
       client.on('message', (topic, messageBuffer) => {
@@ -2527,7 +2595,6 @@
     if (localBus) {
       localBus.postMessage({ topic: GLOBAL_TOPIC, payload });
     }
-    // Also forward global packets over active WebRTC PeerJS connections so school peers see Chat/Leaderboard/Rain!
     peerConnections.forEach(conn => {
       if (conn && conn.open) {
         try { conn.send({ _globalWrap: true, payload }); } catch (e) {}
@@ -2707,9 +2774,9 @@
   }, 5000);
 
   // ============================================================================
-  // 12. REAL MULTIPLAYER 10-SPIN SLOT BATTLES (PORT 443 PEERJS + MQTT)
+  // 12. SAFE MULTIPLAYER 10-SPIN SLOT BATTLES (OPT-IN + READY GUARD + AUTO-LEAVE)
   // ============================================================================
-  let currentRoomCode = 'VIP777';
+  let currentRoomCode = null;
   let currentRoomState = null;
   let peerInstance = null;
   let peerConnections = [];
@@ -2721,7 +2788,14 @@
   }
 
   function subscribeRoomChannel(code) {
-    const newTopic = `neon_royale_777_v36/room/${code}`;
+    if (!code) {
+      if (mqttClient && mqttClient.connected && subscribedRoomTopic) {
+        mqttClient.unsubscribe(subscribedRoomTopic);
+      }
+      subscribedRoomTopic = null;
+      return;
+    }
+    const newTopic = `neon_royale_777_v38/room/${code}`;
     if (mqttClient && mqttClient.connected) {
       if (subscribedRoomTopic && subscribedRoomTopic !== newTopic) {
         mqttClient.unsubscribe(subscribedRoomTopic);
@@ -2731,7 +2805,33 @@
     subscribedRoomTopic = newTopic;
   }
 
+  function leaveCurrentRoom(silent = false) {
+    if (currentRoomState && currentRoomState.running) return;
+    if (currentRoomCode && currentRoomState) {
+      broadcastRoomPacket({
+        type: 'leave_room',
+        playerId: clientId,
+        playerName
+      });
+    }
+    subscribeRoomChannel(null);
+    currentRoomCode = null;
+    currentRoomState = null;
+    if (peerInstance) {
+      try { peerInstance.destroy(); } catch (e) {}
+      peerInstance = null;
+    }
+    peerConnections = [];
+    hostConn = null;
+    renderBattleCards();
+    if (!silent) {
+      elStatus.textContent = "🚪 Left Multiplayer Room. Your bankroll is 100% isolated.";
+      playSound(340, 'sine', 0.08, 0.08);
+    }
+  }
+
   function broadcastRoomPacket(packet) {
+    if (!currentRoomCode) return;
     packet.roomCode = currentRoomCode;
     packet.ts = Date.now();
     packet.pktId = Math.random().toString(36).slice(2, 10);
@@ -2757,7 +2857,6 @@
     if (!data) return;
     if (data._globalWrap && data.payload) {
       handleGlobalPacket(data.payload);
-      // Relay to other connected peers in the room
       peerConnections.forEach(c => {
         if (c !== sourceConn && c && c.open) {
           try { c.send(data); } catch (e) {}
@@ -2770,6 +2869,7 @@
 
   function createOrHostRoom(code) {
     if (currentRoomState && currentRoomState.running) return;
+    leaveCurrentRoom(true);
     currentRoomCode = sanitizeRoomCode(code);
     document.getElementById('roomCodeInput').value = currentRoomCode;
     subscribeRoomChannel(currentRoomCode);
@@ -2790,17 +2890,16 @@
           emoji: playerAvatar,
           profit: 0,
           cells: ['7️⃣', '7️⃣', '7️⃣'],
-          isBot: false
+          isBot: false,
+          ready: true
         }
       }
     };
 
-    // PeerJS uses standard HTTPS Port 443 (0.peerjs.com:443) — works through school firewalls!
     if (window.Peer) {
       try {
-        if (peerInstance) peerInstance.destroy();
         peerConnections = [];
-        peerInstance = new window.Peer(`nr777_v36_room_${currentRoomCode}`, {
+        peerInstance = new window.Peer(`nr777_v38_room_${currentRoomCode}`, {
           host: '0.peerjs.com',
           port: 443,
           secure: true
@@ -2816,7 +2915,6 @@
             broadcastPresence();
           });
         });
-        // If room ID is already hosted by someone else on the network, automatically join it!
         peerInstance.on('error', (err) => {
           if (err && err.type === 'unavailable-id') {
             joinExistingRoom(currentRoomCode);
@@ -2827,12 +2925,13 @@
 
     broadcastRoomState();
     renderBattleCards();
-    elStatus.textContent = `👑 Hosting Room [${currentRoomCode}] on Port 443! Tell friends to type "${currentRoomCode}" and click JOIN ROOM!`;
+    elStatus.textContent = `👑 Hosting Room [${currentRoomCode}]! Friends can type "${currentRoomCode}" and click JOIN ROOM!`;
     playSound(600, 'triangle', 0.12, 0.1);
   }
 
   function joinExistingRoom(code) {
     if (currentRoomState && currentRoomState.running) return;
+    leaveCurrentRoom(true);
     currentRoomCode = sanitizeRoomCode(code);
     document.getElementById('roomCodeInput').value = currentRoomCode;
     subscribeRoomChannel(currentRoomCode);
@@ -2853,14 +2952,14 @@
           emoji: playerAvatar,
           profit: 0,
           cells: ['7️⃣', '7️⃣', '7️⃣'],
-          isBot: false
+          isBot: false,
+          ready: false
         }
       }
     };
 
     if (window.Peer) {
       try {
-        if (peerInstance) peerInstance.destroy();
         peerInstance = new window.Peer({
           host: '0.peerjs.com',
           port: 443,
@@ -2868,7 +2967,7 @@
         });
         peerInstance.on('open', () => {
           document.getElementById('netStatusDot').classList.add('connected');
-          hostConn = peerInstance.connect(`nr777_v36_room_${currentRoomCode}`, { reliable: true });
+          hostConn = peerInstance.connect(`nr777_v38_room_${currentRoomCode}`, { reliable: true });
           hostConn.on('open', () => {
             hostConn.send({
               type: 'join_request',
@@ -2888,7 +2987,7 @@
     });
 
     renderBattleCards();
-    elStatus.textContent = `🔗 Connecting to Room [${currentRoomCode}] via Port 443...`;
+    elStatus.textContent = `🔗 Joined Room [${currentRoomCode}]! Click "✅ READY UP" when you agree to the stake!`;
     playSound(520, 'sine', 0.1, 0.1);
   }
 
@@ -2903,7 +3002,7 @@
   const seenRoomPackets = new Set();
 
   function handleRoomPacket(pkt) {
-    if (!pkt || pkt.roomCode !== currentRoomCode) return;
+    if (!pkt || !currentRoomCode || pkt.roomCode !== currentRoomCode) return;
     if (pkt.pktId) {
       if (seenRoomPackets.has(pkt.pktId)) return;
       seenRoomPackets.add(pkt.pktId);
@@ -2915,18 +3014,36 @@
       if (currentRoomState.hostId === clientId && !currentRoomState.running) {
         const p = pkt.player;
         if (p && p.id && (Object.keys(currentRoomState.players).length < 4 || currentRoomState.players[p.id])) {
+          const existing = currentRoomState.players[p.id];
           currentRoomState.players[p.id] = {
             id: p.id,
             name: String(p.name || 'Player').slice(0, 15),
             emoji: AVATARS.includes(p.emoji) ? p.emoji : '😎',
             profit: 0,
             cells: ['7️⃣', '7️⃣', '7️⃣'],
-            isBot: false
+            isBot: false,
+            ready: existing ? existing.ready : (p.id === clientId)
           };
           addChatMessage('⚔️ ROOM ' + currentRoomCode, `${p.emoji} ${p.name} joined the Slot Battle room!`, true);
           playSound(660, 'triangle', 0.1, 0.09);
           broadcastRoomState();
         }
+      }
+    } else if (pkt.type === 'leave_room') {
+      if (currentRoomState && currentRoomState.players[pkt.playerId] && !currentRoomState.running) {
+        delete currentRoomState.players[pkt.playerId];
+        if (currentRoomState.hostId === clientId) {
+          broadcastRoomState();
+        }
+        renderBattleCards();
+      }
+    } else if (pkt.type === 'toggle_ready') {
+      if (currentRoomState && currentRoomState.players[pkt.playerId] && !currentRoomState.running) {
+        currentRoomState.players[pkt.playerId].ready = !!pkt.ready;
+        if (currentRoomState.hostId === clientId) {
+          broadcastRoomState();
+        }
+        renderBattleCards();
       }
     } else if (pkt.type === 'room_profile_update') {
       if (currentRoomState && currentRoomState.players[pkt.senderId]) {
@@ -2947,24 +3064,33 @@
       }
 
       if (currentRoomState.running && currentRoomState.battleId && paidBattleRoundId !== currentRoomState.battleId) {
-        if (currentRoomState.players[clientId]) {
+        const me = currentRoomState.players[clientId];
+        if (me && activeGame === 'battle' && me.ready) {
           const buyIn = currentRoomState.spinStake * 10;
-          paidBattleRoundId = currentRoomState.battleId;
-          addBalance(-buyIn);
-          saveGame();
-          updateUI();
+          if (getBalance() >= buyIn) {
+            paidBattleRoundId = currentRoomState.battleId;
+            addBalance(-buyIn);
+            saveGame();
+            updateUI();
+          } else {
+            leaveCurrentRoom(false);
+            return;
+          }
         }
       }
 
       renderBattleCards();
     } else if (pkt.type === 'battle_finished') {
       currentRoomState = pkt.state;
+      Object.values(currentRoomState.players).forEach(p => {
+        if (!p.isBot && p.id !== currentRoomState.hostId) p.ready = false;
+      });
       renderBattleCards();
       const winnerId = pkt.winnerId;
       const pot = pkt.pot;
       const winnerObj = currentRoomState.players[winnerId];
 
-      if (winnerId === clientId) {
+      if (winnerId === clientId && paidBattleRoundId === currentRoomState.battleId) {
         addBalance(pot);
         lastWin = pot;
         mpWins++;
@@ -2990,8 +3116,36 @@
 
   function renderBattleCards() {
     const gridEl = document.getElementById('battlePlayersGrid');
-    if (!gridEl || !currentRoomState) return;
+    const leaveBtn = document.getElementById('leaveRoomBtn');
+    const botBtn = document.getElementById('addBotBtn');
+    const readyBtn = document.getElementById('readyBattleBtn');
+    const startBtn = document.getElementById('startBattleBtn');
+
+    if (!gridEl) return;
     gridEl.innerHTML = '';
+
+    if (!currentRoomState) {
+      leaveBtn.disabled = true;
+      botBtn.disabled = true;
+      readyBtn.disabled = true;
+      startBtn.disabled = true;
+      document.getElementById('battleRoundText').textContent = `NOT IN A ROOM (SAFE)`;
+      document.getElementById('battleSpinStakeText').textContent = formatNum(getBet());
+      document.getElementById('battleBuyInText').textContent = formatNum(getBet() * 10);
+      document.getElementById('battlePotText').textContent = '0';
+
+      for (let slot = 0; slot < 4; slot++) {
+        const empty = document.createElement('div');
+        empty.className = 'mp-card empty-seat';
+        empty.innerHTML = `
+          <div style="font-size:26px;">🛡️</div>
+          <div style="font-size:11.5px; font-weight:900; color:var(--cyan);">SAFE OFFLINE SEAT</div>
+          <div style="font-size:10px; color:#9c8ec0;">Click <b>HOST ROOM</b> or <b>JOIN ROOM</b> above to enter a match</div>
+        `;
+        gridEl.appendChild(empty);
+      }
+      return;
+    }
 
     const playersArr = Object.values(currentRoomState.players);
     const pCount = playersArr.length;
@@ -3003,11 +3157,21 @@
     document.getElementById('battlePotText').textContent = formatNum(pot);
 
     const isHost = currentRoomState.hostId === clientId;
-    const startBtn = document.getElementById('startBattleBtn');
-    startBtn.disabled = currentRoomState.running || !isHost || pCount < 2;
+    const me = currentRoomState.players[clientId];
+    const allReady = playersArr.every(p => p.isBot || p.ready);
+
+    leaveBtn.disabled = currentRoomState.running;
+    botBtn.disabled = currentRoomState.running || !isHost || pCount >= 4;
+    readyBtn.disabled = currentRoomState.running || !me;
+    if (me) {
+      readyBtn.textContent = me.ready ? '✅ READY (CLICK TO UNREADY)' : '🔒 CLICK TO READY UP';
+      readyBtn.className = me.ready ? 'btn-mp green' : 'btn-mp purple';
+    }
+
+    startBtn.disabled = currentRoomState.running || !isHost || pCount < 2 || !allReady;
     startBtn.textContent = isHost
-      ? (pCount < 2 ? '⏳ NEED 2+ PLAYERS (OR +BOT)' : '⚔️ START 10-SPIN BATTLE!')
-      : `⏳ WAITING FOR HOST (${currentRoomState.hostName || 'Host'})`;
+      ? (pCount < 2 ? '⏳ NEED 2+ PLAYERS' : (!allReady ? '⏳ WAITING FOR ALL READY' : '⚔️ START 10-SPIN BATTLE!'))
+      : `⏳ HOST: ${currentRoomState.hostName || 'Host'}`;
 
     if (currentRoomState.running) {
       document.getElementById('battleRoundText').textContent = `🔥 LIVE SPIN ${currentRoomState.round} / 10`;
@@ -3027,7 +3191,7 @@
         empty.innerHTML = `
           <div style="font-size:24px;">🪑</div>
           <div style="font-size:11px; font-weight:900; color:#a796d1;">OPEN PLAYER SEAT</div>
-          <div style="font-size:10px; color:#7c6ba1;">Join Room Code <b>${currentRoomState.roomCode}</b></div>
+          <div style="font-size:10px; color:#7c6ba1;">Room Code: <b>${currentRoomState.roomCode}</b></div>
         `;
         gridEl.appendChild(empty);
         continue;
@@ -3035,12 +3199,13 @@
 
       const isYou = p.id === clientId;
       const isLeader = currentRoomState.round > 0 && p.profit === maxProfit;
+      const readyTag = p.isBot ? '🤖 BOT' : (p.ready ? '✅ READY' : '⏳ UNREADY');
       const card = document.createElement('div');
       card.className = `mp-card ${isYou ? 'you' : ''} ${isLeader ? 'leader' : ''}`;
       card.innerHTML = `
         <div class="mp-header">
           <span>${p.emoji} ${p.name} ${isYou ? '(YOU)' : ''}</span>
-          <span>${isLeader ? '👑 #1' : (p.id === currentRoomState.hostId ? '⭐ HOST' : '')}</span>
+          <span style="color:${p.ready || p.isBot ? 'var(--green)' : '#ffab00'};">${isLeader ? '👑 #1' : readyTag}</span>
         </div>
         <div class="mp-mini-reels">
           <div class="mp-mini-cell">${p.cells[0]}</div>
@@ -3067,6 +3232,29 @@
     joinExistingRoom(code);
   };
 
+  document.getElementById('leaveRoomBtn').onclick = () => {
+    leaveCurrentRoom(false);
+  };
+
+  document.getElementById('readyBattleBtn').onclick = () => {
+    if (!currentRoomState || currentRoomState.running || !currentRoomState.players[clientId]) return;
+    const me = currentRoomState.players[clientId];
+    const buyIn = currentRoomState.spinStake * 10;
+    if (!me.ready && getBalance() < buyIn) {
+      elStatus.textContent = `Need $${formatNum(buyIn)} to Ready Up for this room's stake!`;
+      playSound(160, 'sawtooth', 0.2, 0.1);
+      return;
+    }
+    const nextReady = !me.ready;
+    me.ready = nextReady;
+    broadcastRoomPacket({
+      type: 'toggle_ready',
+      playerId: clientId,
+      ready: nextReady
+    });
+    playSound(nextReady ? 620 : 340, 'triangle', 0.08, 0.08);
+  };
+
   document.getElementById('addBotBtn').onclick = () => {
     if (!currentRoomState || currentRoomState.running) return;
     if (currentRoomState.hostId !== clientId) {
@@ -3091,7 +3279,8 @@
       emoji: pick.emoji,
       profit: 0,
       cells: ['💎', '7️⃣', '💎'],
-      isBot: true
+      isBot: true,
+      ready: true
     };
     broadcastRoomState();
     playSound(520, 'sine', 0.08, 0.08);
@@ -3100,14 +3289,24 @@
   document.getElementById('startBattleBtn').onclick = startMultiplayerSlotBattle;
 
   function startMultiplayerSlotBattle() {
-    if (!currentRoomState || currentRoomState.running) return;
+    if (!currentRoomState) {
+      elStatus.textContent = "Click 👑 HOST ROOM or 🔗 JOIN ROOM first to enter a Battle Room!";
+      return;
+    }
+    if (currentRoomState.running) return;
     if (currentRoomState.hostId !== clientId) {
       elStatus.textContent = "Waiting for the Room Host to start the 10-Spin Battle!";
       return;
     }
-    const pCount = Object.keys(currentRoomState.players).length;
+    const playersArr = Object.values(currentRoomState.players);
+    const pCount = playersArr.length;
     if (pCount < 2) {
-      elStatus.textContent = "Need at least 2 players in the room (invite a friend or click +AI BOT)!";
+      elStatus.textContent = "Need at least 2 players in the room (invite a friend or click +BOT)!";
+      playSound(180, 'sawtooth', 0.2, 0.1);
+      return;
+    }
+    if (!playersArr.every(p => p.isBot || p.ready)) {
+      elStatus.textContent = "Waiting for all players in the room to click ✅ READY UP!";
       playSound(180, 'sawtooth', 0.2, 0.1);
       return;
     }
@@ -3184,11 +3383,15 @@
   document.querySelectorAll('.btn-emoji').forEach(btn => {
     btn.onclick = () => {
       const emo = btn.dataset.emo;
-      broadcastRoomPacket({
-        type: 'room_taunt',
-        name: `${playerAvatar} ${playerName}`,
-        emo
-      });
+      if (currentRoomCode) {
+        broadcastRoomPacket({
+          type: 'room_taunt',
+          name: `${playerAvatar} ${playerName}`,
+          emo
+        });
+      } else {
+        spawnFloatingText(`${playerAvatar} ${playerName}: ${emo}`, window.innerWidth / 2, window.innerHeight / 2);
+      }
     };
   });
 
@@ -3369,8 +3572,8 @@
   loadGame();
   syncProfileUI();
   tryConnectPort443Broker(0);
-  createOrHostRoom('VIP777');
-  addChatMessage('🌍 SYSTEM', 'v3.6 Port-443 School-Friendly Multiplayer Active! No more :8084 errors.', true);
+  renderBattleCards();
+  addChatMessage('🌍 SYSTEM', 'v3.8 Active: Automatic Save-History Verification + Safe Multiplayer Rooms!', true);
 
   if (!localStorage.getItem(PROFILE_SET_KEY)) {
     openProfileModal();
