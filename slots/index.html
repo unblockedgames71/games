@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON ROYALE 777 - v4.3 STUN FIREWALL BYPASS</title>
+<title>NEON ROYALE 777 - v4.4 HTTPS CLOUD RELAY EDITION</title>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
   :root {
@@ -133,6 +133,7 @@
     cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.15s;
   }
   .shield-badge:hover { background: var(--green); color: #000; }
+  .shield-badge.compromised { background: rgba(255, 23, 68, 0.2); border-color: var(--red); color: var(--red); box-shadow: 0 0 14px var(--red); }
   .vip-badge {
     background: linear-gradient(135deg, #ffd700, #ff8800); color: #000;
     font-weight: 900; font-size: 10.5px; padding: 5px 10px; border-radius: 12px;
@@ -286,7 +287,8 @@
   .side-tab-btn.active { background: linear-gradient(135deg, var(--cyan), #0077ff); color: #000; }
   .side-tab-pane { flex: 1; min-height: 0; display: none; flex-direction: column; gap: 8px; overflow: hidden; }
   .side-tab-pane.active { display: flex; }
-  .profile-bar { display: flex; justify-content: space-between; align-items: center; background: #090414; padding: 7px 10px; border-radius: 9px; border: 1px solid #2b1d52; font-size: 11.5px; }
+  .profile-bar { display: flex; justify-content: space-between; align-items: center; background: #090414; padding: 7px 10px; border-radius: 9px; border: 1px solid #2b1d52; font-size: 11.5px; gap: 6px; }
+  .name-input { background: #140a2e; border: 1px solid var(--cyan); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase; user-select: text; }
   .lb-list { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; padding-right: 3px; }
   .lb-row { background: #0b0618; border: 1px solid #221544; border-radius: 8px; padding: 7px 9px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; }
   .lb-row.you { border-color: var(--cyan); background: rgba(0, 243, 255, 0.08); }
@@ -341,7 +343,6 @@
   .avatar-option.selected { border-color: var(--gold); background: rgba(255, 215, 0, 0.18); box-shadow: 0 0 14px rgba(255, 215, 0, 0.4); transform: scale(1.06); }
   .username-modal-input { width: 100%; background: #090414; border: 2px solid var(--cyan); color: #fff; padding: 10px 12px; border-radius: 10px; font-size: 16px; font-weight: 900; outline: none; user-select: text; margin-bottom: 6px; }
 
-  /* Floating Text & FX Canvas */
   .float-win { position: fixed; pointer-events: none; font-size: 34px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px #ff007f, 0 4px 8px #000; z-index: 25; animation: floatUp 1.3s ease-out forwards; }
   @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0) scale(0.7); } 30% { transform: translate(-50%, -35px) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -110px) scale(1); } }
   #fxCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 15; }
@@ -352,8 +353,8 @@
 
 <!-- LIVE REAL-TIME GLOBAL BROADCAST TICKER -->
 <div class="global-ticker">
-  <span class="ticker-badge">🌍 GLOBAL NETWORK</span>
-  <div class="ticker-content" id="liveTickerText">v4.3 Active: STUN Firewall Bypass & Private School Subnets Live!</div>
+  <span class="ticker-badge">🌍 HTTPS CLOUD RELAY</span>
+  <div class="ticker-content" id="liveTickerText">v4.4 Active: HTTPS Port-443 Cloud Stream + TURN-TCP-443 School Wi-Fi Bypass Live!</div>
   <div class="online-pill">
     <span class="online-dot" id="netStatusDot"></span>
     <span id="onlineCountText">Connecting...</span>
@@ -516,7 +517,7 @@
         <div class="battle-players-grid" id="battlePlayersGrid"></div>
 
         <div class="taunt-bar">
-          <span style="font-size:11px; color:#a796d1; font-weight:800;">🛡️ STUN Firewall Bypass: Host/Join a Room to bypass school NAT filtering. Highest 10-Spin Profit wins the Pot!</span>
+          <span style="font-size:11px; color:#a796d1; font-weight:800;">🛡️ HTTPS Cloud Relay + TURN-443: Works across isolated school Chromebooks! Highest 10-Spin Profit wins the Pot:</span>
           <div class="emoji-btns">
             <button class="btn-emoji" data-emo="🔥">🔥</button>
             <button class="btn-emoji" data-emo="💎">💎</button>
@@ -552,7 +553,7 @@
       <button class="btn-auto" id="autoBtn">AUTO</button>
     </div>
 
-    <div class="status-msg" id="statusMsg">🛡️ v4.3 Active: Private Net IDs & Google STUN Servers added!</div>
+    <div class="status-msg" id="statusMsg">🛡️ v4.4 Active: HTTPS Cloud Relay + TURN-TCP-443 School Wi-Fi Bypass!</div>
   </div>
 
   <!-- SIDE PANEL: REAL MULTIPLAYER LEADERBOARD, LIVE CHAT & PAYTABLE -->
@@ -565,10 +566,10 @@
 
     <!-- PANE 1: REAL ONLINE LEADERBOARD -->
     <div id="paneLb" class="side-tab-pane active">
-      <div class="profile-bar" style="margin-bottom: 5px;">
+      <div class="profile-bar">
         <span style="font-size:10px; color:var(--cyan); font-weight:900;">🌐 NET ID:</span>
-        <input type="text" id="networkIdInput" class="name-input" value="GLOBAL" maxlength="12" style="width:120px;" title="Change this to a secret word to create a private server for your school!" />
-        <button class="btn-mp" id="joinNetworkBtn" style="padding:4px 8px; font-size:10px;">RECONNECT</button>
+        <input type="text" id="networkIdInput" class="name-input" value="GLOBAL" maxlength="12" style="flex:1;" title="Both you and your friend type the same Net ID!" />
+        <button class="btn-mp" id="joinNetworkBtn" style="padding:4px 8px; font-size:10px;">SYNC</button>
       </div>
       <div class="profile-bar">
         <span>👤 <b id="sideProfileLabel" style="color:var(--cyan);">Player</b></span>
@@ -679,8 +680,8 @@
     <h2 class="changelog-title">🛡️ AEGIS VAULT™ SECURITY</h2>
     <div class="changelog-sub">Automatic verification, memory encapsulation & intrusion logging.</div>
     <div class="changelog-list">
-      <div class="changelog-item">🌐 <b>v4.3 Update:</b> Added Google STUN servers and a Private Net ID field so players on strict school firewalls can build a local P2P mesh and bypass blocks!</div>
-      <div class="changelog-item">🔍 <b>Automatic Save-History Verification:</b> Aegis automatically inspects your signed `biggestWin` and `currentBet` in `localStorage`. If your save proves you reached high-roller status before the wipe bug, it will automatically restore your bankroll!</div>
+      <div class="changelog-item">🌐 <b>v4.4 School Wi-Fi Fix:</b> School networks block direct computer-to-computer UDP packets (AP Isolation). v4.4 routes all Leaderboard, Chat, and Battle packets through **HTTPS Port-443 Cloud Streams** + **TURN-TCP-443 Relay Servers**!</div>
+      <div class="changelog-item">🔍 <b>Automatic Save-History Verification:</b> Aegis automatically inspects your signed `biggestWin` and `currentBet` in `localStorage`.</div>
       <div class="changelog-item">📊 <b>Security Audit Log:</b> <span id="acLogStatus" style="color:var(--green); font-weight:900;">0 Intrusion Attempts Blocked</span></div>
     </div>
     <div style="display:flex; gap:8px;">
@@ -975,7 +976,7 @@
         feverSpinsLeft,
         plinkoRisk,
         grid,
-        v: 43
+        v: 44
       };
       data.aegis_sig = computePayloadSignature(data, SALT_V37);
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
@@ -2090,15 +2091,39 @@
   drawRouletteWheel();
 
   // ============================================================================
-  // 11. STUN P2P GLOBAL MESH ENGINE (NO PUBLIC BROKERS)
+  // 11. DUAL-ENGINE HTTPS CLOUD RELAY + TURN-TCP-443 MESH (SCHOOL WIFI BYPASS)
   // ============================================================================
-  const NUM_LOBBY_SLOTS = 8;
+  // Why v4.4 works even when school Wi-Fi blocks direct P2P / UDP:
+  // 1) Pure HTTPS Cloud Stream (ntfy.sh over standard HTTPS Port 443 EventSource + fetch POST)
+  //    requires ZERO direct connection between school Chromebooks!
+  // 2) PeerJS configured with TURN-over-TCP-Port-443 relay servers so WebRTC packets
+  //    tunnel through TCP Port 443 instead of blocked UDP!
+  const NUM_LOBBY_SLOTS = 6;
   let lobbyPeer = null;
   let myLobbySlot = -1;
   const lobbyMeshConns = new Map();
   const onlinePlayers = new Map();
+  let cloudEventSource = null;
 
-  const localBus = ('BroadcastChannel' in window) ? new BroadcastChannel('neon_royale_777_v43_bus') : null;
+  // Ice Configuration with TURN-over-TCP Port 443 to bypass School NAT / Client Isolation
+  const ICE_CONFIG = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:openrelay.metered.ca:80' },
+      {
+        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turns:openrelay.metered.ca:443?transport=tcp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      }
+    ]
+  };
+
+  const localBus = ('BroadcastChannel' in window) ? new BroadcastChannel('neon_royale_777_v44_bus') : null;
   if (localBus) {
     localBus.onmessage = (e) => {
       if (e.data && e.data.type === 'global') handleGlobalPacket(e.data.payload);
@@ -2106,11 +2131,58 @@
     };
   }
 
-  function getLobbyPrefix() {
-    const netId = document.getElementById('networkIdInput').value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '') || 'GLOBAL';
-    return `nr777_v43_${netId}_hub_`;
+  function getNetIdClean() {
+    return document.getElementById('networkIdInput').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') || 'GLOBAL';
   }
 
+  function getLobbyPrefix() {
+    return `nr777_v44_${getNetIdClean()}_hub_`;
+  }
+
+  function getCloudTopicUrl(isRoom = false, roomCode = '') {
+    const net = getNetIdClean();
+    const channel = isRoom ? `nr777_v44_room_${net}_${roomCode}` : `nr777_v44_net_${net}`;
+    return `https://ntfy.sh/${channel}`;
+  }
+
+  // ENGINE 1: HTTPS Port-443 Server-Sent Events (SSE) Cloud Stream
+  function connectHttpsCloudStream() {
+    if (cloudEventSource) {
+      try { cloudEventSource.close(); } catch (e) {}
+      cloudEventSource = null;
+    }
+    const baseUrl = getCloudTopicUrl(false);
+    try {
+      cloudEventSource = new EventSource(`${baseUrl}/sse`);
+      cloudEventSource.onopen = () => {
+        document.getElementById('netStatusDot').classList.add('connected');
+        document.getElementById('liveTickerText').textContent = `🌍 Connected via HTTPS Port-443 Cloud Relay (Net ID: ${getNetIdClean()})!`;
+        broadcastPresence();
+      };
+      cloudEventSource.onmessage = (ev) => {
+        try {
+          const outer = JSON.parse(ev.data);
+          if (outer && outer.event === 'message' && outer.message) {
+            const inner = JSON.parse(outer.message);
+            if (inner._kind === 'global') handleGlobalPacket(inner.payload, false);
+            else if (inner._kind === 'room') handleRoomPacket(inner.payload);
+          }
+        } catch (e) {}
+      };
+    } catch (e) {}
+  }
+
+  function postToHttpsCloud(kind, payload) {
+    const baseUrl = getCloudTopicUrl(false);
+    try {
+      fetch(baseUrl, {
+        method: 'POST',
+        body: JSON.stringify({ _kind: kind, payload })
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  // ENGINE 2: TURN-TCP-443 PeerJS Mesh
   function initGlobalPeerMesh(trySlot = 0) {
     if (!window.Peer) return;
     const prefix = getLobbyPrefix();
@@ -2123,19 +2195,13 @@
         host: '0.peerjs.com',
         port: 443,
         secure: true,
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
-          ]
-        }
+        config: ICE_CONFIG
       });
 
-      p.on('open', (id) => {
+      p.on('open', () => {
         lobbyPeer = p;
         myLobbySlot = trySlot < NUM_LOBBY_SLOTS ? trySlot : -1;
         document.getElementById('netStatusDot').classList.add('connected');
-        document.getElementById('liveTickerText').textContent = `🌍 Connected to Global Network! Leaderboard & Chat Live.`;
         connectToAllLobbyHubs();
         broadcastPresence();
         updateOnlineCounter();
@@ -2159,6 +2225,10 @@
       try { lobbyPeer.destroy(); } catch (e) {}
       lobbyPeer = null;
     }
+    if (cloudEventSource) {
+      try { cloudEventSource.close(); } catch (e) {}
+      cloudEventSource = null;
+    }
     lobbyMeshConns.clear();
     onlinePlayers.clear();
     renderLeaderboard();
@@ -2166,10 +2236,11 @@
 
   document.getElementById('joinNetworkBtn').onclick = () => {
     disconnectGlobalMesh();
-    document.getElementById('liveTickerText').textContent = `Reconnecting to Network ID: ${document.getElementById('networkIdInput').value}...`;
+    document.getElementById('liveTickerText').textContent = `Syncing HTTPS Cloud Relay to Net ID: ${getNetIdClean()}...`;
     document.getElementById('netStatusDot').classList.remove('connected');
+    connectHttpsCloudStream();
     initGlobalPeerMesh(0);
-    playSound(400, 'triangle', 0.1, 0.1);
+    playSound(520, 'triangle', 0.1, 0.1);
   };
 
   function connectToAllLobbyHubs() {
@@ -2213,9 +2284,7 @@
       if (!data) return;
       if (data._meshGlobal && data.payload) {
         const isNew = handleGlobalPacket(data.payload, false);
-        if (isNew) {
-          relayToLobbyMesh(data, conn.peer);
-        }
+        if (isNew) relayToLobbyMesh(data, conn.peer);
       }
     });
 
@@ -2239,13 +2308,16 @@
     }
   }
 
-  function publishGlobalPacket(payload) {
+  function publishGlobalPacket(payload, sendOverHttps = true) {
     payload.senderId = clientId;
     payload.ts = Date.now();
     payload.pktId = clientId + '_' + payload.ts + '_' + Math.random().toString(36).slice(2, 6);
 
     if (localBus) {
       localBus.postMessage({ type: 'global', payload });
+    }
+    if (sendOverHttps) {
+      postToHttpsCloud('global', payload);
     }
     relayToLobbyMesh({ _meshGlobal: true, payload }, null);
     handleGlobalPacket(payload, true);
@@ -2266,6 +2338,7 @@
     if (msg.type === 'presence') {
       const expectedSig = computeHash(`${msg.senderId}|${msg.balance}|${msg.mpWins || 0}`, SALT_V37);
       if (msg.sig !== expectedSig) return false;
+      const isNewPeer = !onlinePlayers.has(msg.senderId);
       onlinePlayers.set(msg.senderId, {
         id: msg.senderId,
         name: String(msg.name || 'Player').slice(0, 15),
@@ -2276,6 +2349,10 @@
       });
       renderLeaderboard();
       updateOnlineCounter();
+      // If we just discovered a new player on our Net ID, immediately reply with our presence so both leaderboards sync!
+      if (isNewPeer && msg.senderId !== clientId) {
+        setTimeout(() => broadcastPresence(), 250);
+      }
     } else if (msg.type === 'chat') {
       if (isLocalEcho && msg.senderId === clientId && !msg.isSys) return true;
       addChatMessage(msg.user, msg.text, !!msg.isSys);
@@ -2305,13 +2382,13 @@
       balance: bal,
       mpWins,
       sig
-    });
+    }, true);
   }
 
   function updateOnlineCounter() {
     const now = Date.now();
     for (const [id, info] of onlinePlayers.entries()) {
-      if (id !== clientId && now - info.lastSeen > 22000) {
+      if (id !== clientId && now - info.lastSeen > 35000) {
         onlinePlayers.delete(id);
       }
     }
@@ -2377,7 +2454,7 @@
     inp.value = '';
     const label = `${playerAvatar} ${playerName}`;
     addChatMessage(label, txt, false);
-    publishGlobalPacket({ type: 'chat', user: label, text: txt, isSys: false });
+    publishGlobalPacket({ type: 'chat', user: label, text: txt, isSys: false }, true);
     playSound(520, 'sine', 0.05, 0.06);
   }
 
@@ -2396,17 +2473,17 @@
       user: playerName,
       avatar: playerAvatar,
       share
-    });
+    }, true);
     publishGlobalPacket({
       type: 'chat',
       user: '🌧️ CASH RAIN',
       text: `💸 ${playerAvatar} ${playerName} just MADE IT RAIN $1,000 across all online players!`,
       isSys: true
-    });
+    }, true);
     publishGlobalPacket({
       type: 'ticker',
       text: `🌧️ ${playerAvatar} ${playerName} dropped a $1,000 Cash Rain in the global lobby!`
-    });
+    }, true);
     spawnParticles(70, true);
     playWinChord();
     saveGame();
@@ -2418,10 +2495,10 @@
     connectToAllLobbyHubs();
     broadcastPresence();
     updateOnlineCounter();
-  }, 4500);
+  }, 8000);
 
   // ============================================================================
-  // 12. SAFE MULTIPLAYER 10-SPIN SLOT BATTLES
+  // 12. SAFE MULTIPLAYER 10-SPIN SLOT BATTLES (HTTPS CLOUD + TURN-TCP-443)
   // ============================================================================
   let currentRoomCode = null;
   let currentRoomState = null;
@@ -2464,6 +2541,9 @@
     if (localBus) {
       localBus.postMessage({ type: 'room', payload: packet });
     }
+    // Send over HTTPS Cloud Relay so isolated school Chromebooks receive every room packet!
+    postToHttpsCloud('room', packet);
+
     peerConnections.forEach(conn => {
       if (conn && conn.open) {
         try { conn.send(packet); } catch (e) {}
@@ -2520,24 +2600,9 @@
       }
     };
 
-    if (lobbyPeer) {
-      lobbyPeer.off('connection', handleRoomConn);
-      function handleRoomConn(conn) {
-        if (conn.metadata && conn.metadata.roomCode === currentRoomCode) {
-          peerConnections.push(conn);
-          conn.on('data', (data) => handleIncomingPeerData(data, conn));
-          conn.on('open', () => {
-            if (currentRoomState) conn.send({ type: 'room_state', roomCode: currentRoomCode, state: currentRoomState });
-            broadcastPresence();
-          });
-        }
-      }
-      lobbyPeer.on('connection', handleRoomConn);
-    }
-
     broadcastRoomState();
     renderBattleCards();
-    elStatus.textContent = `👑 Hosting Room [${currentRoomCode}]! Friends can type "${currentRoomCode}" and click JOIN ROOM!`;
+    elStatus.textContent = `👑 Hosting Room [${currentRoomCode}]! Friends on Net ID "${getNetIdClean()}" can type "${currentRoomCode}" and click JOIN ROOM!`;
     playSound(600, 'triangle', 0.12, 0.1);
   }
 
@@ -2569,40 +2634,14 @@
       }
     };
 
-    publishGlobalPacket({
-      type: 'room_join_broadcast',
-      roomCode: currentRoomCode,
+    broadcastRoomPacket({
+      type: 'join_request',
       player: { id: clientId, name: playerName, emoji: playerAvatar }
     });
 
     renderBattleCards();
-    elStatus.textContent = `🔗 Joined Room [${currentRoomCode}]! Click "✅ READY UP" when you agree to the stake!`;
+    elStatus.textContent = `🔗 Joined Room [${currentRoomCode}] via HTTPS Cloud Relay! Click "✅ READY UP" when you agree to the stake!`;
     playSound(520, 'sine', 0.1, 0.1);
-  }
-
-  const originalGlobalHandle = handleGlobalPacket;
-  handleGlobalPacket = function(msg, isLocal) {
-    const handled = originalGlobalHandle(msg, isLocal);
-    if (msg.type === 'room_join_broadcast' && currentRoomState && currentRoomState.hostId === clientId && msg.roomCode === currentRoomCode) {
-      if (!currentRoomState.running) {
-        handleRoomPacket({
-          type: 'join_request',
-          roomCode: currentRoomCode,
-          player: msg.player,
-          ts: Date.now()
-        });
-        if (lobbyPeer) {
-          const prefix = getLobbyPrefix();
-          const targetPeerId = `${prefix}leaf_${msg.player.id}`;
-          try {
-            const conn = lobbyPeer.connect(targetPeerId, { reliable: true, metadata: { roomCode: currentRoomCode } });
-            peerConnections.push(conn);
-            conn.on('data', (data) => handleIncomingPeerData(data, conn));
-          } catch(e) {}
-        }
-      }
-    }
-    return handled;
   }
 
   function broadcastRoomState() {
@@ -2950,7 +2989,7 @@
       user: '⚔️ BATTLE ARENA',
       text: `Room [${currentRoomCode}] started a 10-Spin Slot Battle for a $${formatNum(buyIn * pCount)} Pot!`,
       isSys: true
-    });
+    }, true);
 
     runHostBattleRoundLoop();
   }
@@ -3185,9 +3224,10 @@
   // Initialize Everything
   loadGame();
   syncProfileUI();
+  connectHttpsCloudStream();
   initGlobalPeerMesh(0);
   renderBattleCards();
-  addChatMessage('🌍 SYSTEM', 'v4.3 Active: Google STUN & Private Net IDs enabled!', true);
+  addChatMessage('🌍 SYSTEM', 'v4.4 Active: HTTPS Port-443 Cloud Stream + TURN-TCP-443 Relay enabled!', true);
 
   if (!localStorage.getItem(PROFILE_SET_KEY)) {
     openProfileModal();
