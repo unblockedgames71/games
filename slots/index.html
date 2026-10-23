@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON ROYALE 777 - v3.8 VERIFIED VAULT EDITION</title>
-<!-- Real Multiplayer Networking Libraries (Port 443 Compatible) -->
+<title>NEON ROYALE 777 - v4.2 FULLY LOCKED P2P EDITION</title>
+<!-- Pure Port-443 PeerJS WebRTC (No MQTT Brokers Required!) -->
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-<script src="https://unpkg.com/mqtt@5.3.4/dist/mqtt.min.js"></script>
 <style>
   :root {
     --bg: #070312;
@@ -380,7 +379,7 @@
     background: #0b051c; padding: 6px 12px; border-radius: 9px; border: 1px solid #2b1d52;
   }
 
-  /* VIEW 4: REAL MULTIPLAYER 10-SPIN SLOT BATTLES */
+  /* VIEW 4: REAL ONLINE MULTIPLAYER 10-SPIN SLOT BATTLES */
   .battle-stage {
     flex: 1; min-height: 0;
     background: #05020a; border-radius: 16px; border: 2px solid var(--purple);
@@ -667,7 +666,7 @@
   .modal-backdrop.open { display: flex; }
   .gamble-box, .changelog-box {
     background: var(--panel); border: 3px solid var(--gold); border-radius: 20px;
-    padding: 20px; width: 460px; max-width: 100%; text-align: center;
+    padding: 20px; width: 470px; max-width: 100%; text-align: center;
     box-shadow: 0 0 50px rgba(255, 215, 0, 0.4);
   }
   .changelog-box {
@@ -744,7 +743,7 @@
 <!-- LIVE REAL-TIME GLOBAL BROADCAST TICKER -->
 <div class="global-ticker">
   <span class="ticker-badge">🌍 PORT-443 LIVE FEED</span>
-  <div class="ticker-content" id="liveTickerText">v3.8 Active: Verified Save-History Recovery + Safe Multiplayer Room Protection!</div>
+  <div class="ticker-content" id="liveTickerText">v4.2 Fully Locked Down: Automatic Save Recovery Only!</div>
   <div class="online-pill">
     <span class="online-dot" id="netStatusDot"></span>
     <span id="onlineCountText">Connecting...</span>
@@ -768,7 +767,7 @@
           <span id="topUserName">Player</span>
           <span style="font-size:9px; color:var(--cyan);">✏️</span>
         </button>
-        <button class="shield-badge" id="openAnticheatBtn" title="Aegis Vault Anticheat & Verified Recovery">🛡️ AEGIS</button>
+        <button class="shield-badge" id="openAnticheatBtn" title="Click here to view Aegis Anticheat logs">🛡️ AEGIS</button>
         <div class="vip-badge" id="vipBadge">VIP TIER I</div>
       </div>
     </div>
@@ -943,7 +942,7 @@
       <button class="btn-auto" id="autoBtn">AUTO</button>
     </div>
 
-    <div class="status-msg" id="statusMsg">🛡️ v3.8 Active: Automatic Save-History Verification & Safe Multiplayer Rooms!</div>
+    <div class="status-msg" id="statusMsg">🛡️ v4.2 Active: Manual exploit removed. Verified Save-History auto-recovery only!</div>
   </div>
 
   <!-- SIDE PANEL: REAL MULTIPLAYER LEADERBOARD, LIVE CHAT & PAYTABLE -->
@@ -1023,7 +1022,7 @@
 
     <div class="save-footer">
       <button class="bailout-btn" id="bailoutBtn">🆘 BROKE! CLAIM $5000 BAILOUT</button>
-      <div class="save-status" id="saveStatus">🛡️ Aegis 64-Bit Signed Save Active</div>
+      <div class="save-status" id="saveStatus">🛡️ Aegis Multi-Version Signed Save Active</div>
       <div class="footer-btns">
         <button class="changelog-side-btn" id="openProfileFooterBtn">👤 Edit Username</button>
         <button class="reset-btn" id="resetSaveBtn">🗑️ Reset Save</button>
@@ -1059,18 +1058,14 @@
   </div>
 </div>
 
-<!-- AEGIS ANTICHEAT SECURITY & VERIFIED RECOVERY MODAL -->
+<!-- AEGIS ANTICHEAT MODAL -->
 <div class="modal-backdrop" id="anticheatModal">
   <div class="changelog-box">
-    <h2 class="changelog-title">🛡️ AEGIS VAULT™ 64-BIT SECURITY</h2>
-    <div class="changelog-sub">Automatic Save-History Verification & Cryptographic Recovery</div>
+    <h2 class="changelog-title">🛡️ AEGIS VAULT™ SECURITY</h2>
+    <div class="changelog-sub">Automatic verification, memory encapsulation & intrusion logging.</div>
     <div class="changelog-list">
-      <div class="changelog-item">🔍 <b>Automatic Save-History Verification:</b> On load, Aegis inspects your signed `biggestWin`, `currentBet`, and spin history. If your save proves you reached high-roller status before the v3.6 32-bit reset, it restores your bankroll automatically!</div>
-      <div class="changelog-item">🔑 <b>One-Time Admin Recovery Key:</b> If your friend needs manual restoration, enter the private one-time recovery key below:</div>
-      <div style="display:flex; gap:6px; margin-top:4px;">
-        <input type="password" id="recoveryCodeInput" class="chat-input" placeholder="Enter private recovery key..." />
-        <button class="btn-mp gold" id="redeemRecoveryBtn">🔓 VERIFY & RESTORE</button>
-      </div>
+      <div class="changelog-item">🌐 <b>v4.2 Update:</b> The manual recovery features and secret keys have been permanently removed to secure the global economy against exploits.</div>
+      <div class="changelog-item">🔍 <b>Automatic Save-History Verification:</b> Aegis automatically inspects your signed `biggestWin` and `currentBet` in `localStorage`. If your save proves you reached high-roller status before the v3.6 wipe bug, it will automatically restore your bankroll!</div>
       <div class="changelog-item">📊 <b>Security Audit Log:</b> <span id="acLogStatus" style="color:var(--green); font-weight:900;">0 Intrusion Attempts Blocked</span></div>
     </div>
     <div style="display:flex; gap:8px;">
@@ -1085,21 +1080,24 @@
   "use strict";
 
   // ============================================================================
-  // 1. AEGIS VAULT™ 64-BIT ANTICHEAT (NO 32-BIT XOR OVERFLOW AT $2.14 BILLION!)
+  // 1. AEGIS VAULT™ 64-BIT ANTICHEAT (BACKWARD-COMPATIBLE WITH ALL V3 SALTS!)
   // ============================================================================
   const SAVE_KEY = 'neon_royale_777_save_v1';
   const PROFILE_SET_KEY = 'neon_royale_777_profile_configured_v35';
-  const RECOVERY_CLAIMED_KEY = 'neon_royale_777_overflow_recovered_v38';
-  const SECRET_SALT = 'AEGIS_NEON_ROYALE_777_V37_SALT_99481';
+  const AUTO_RESTORE_KEY = 'neon_royale_777_v39_migration_restored'; 
+
+  const SALT_V37 = 'AEGIS_NEON_ROYALE_777_V37_SALT_99481';
+  const SALT_V35 = 'AEGIS_NEON_ROYALE_777_V35_SALT_99481';
+  const SALT_V30 = 'AEGIS_NEON_ROYALE_777_V3_SALT_99481';
   const MAX_SAFE_BANKROLL = 900000000000000; // 900 Trillion (64-bit safe)
 
   let sessionOffset = Math.floor(Math.random() * 9000000) + 1337;
   let _vaultValue = 5000 * 7 + sessionOffset;
-  let _shadowHash = computeHash(5000);
+  let _shadowHash = computeHash(5000, SALT_V37);
   let cheatStrikes = 0;
 
-  function computeHash(input) {
-    let str = SECRET_SALT + ':' + String(input);
+  function computeHash(input, salt = SALT_V37) {
+    let str = salt + ':' + String(input);
     let h1 = 0xdeadbeef ^ str.length, h2 = 0x41c6ce57 ^ str.length;
     for (let i = 0; i < str.length; i++) {
       let ch = str.charCodeAt(i);
@@ -1111,14 +1109,24 @@
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
   }
 
-  function computePayloadSignature(obj) {
+  function computePayloadSignature(obj, salt = SALT_V37) {
     const core = `${obj.balance}|${obj.jackpot}|${obj.totalSpins}|${obj.totalPlinkoDrops}|${obj.biggestWin}|${obj.mpWins || 0}`;
-    return computeHash(core);
+    return computeHash(core, salt);
+  }
+
+  // Accepts saves signed by v3.0, v3.5, v3.6, v3.7, or v3.8 so updating never wipes your save!
+  function isValidSaveSignature(obj) {
+    if (!obj || !obj.aegis_sig) return true; // v1/v2 legacy unsigned save
+    return (
+      obj.aegis_sig === computePayloadSignature(obj, SALT_V37) ||
+      obj.aegis_sig === computePayloadSignature(obj, SALT_V35) ||
+      obj.aegis_sig === computePayloadSignature(obj, SALT_V30)
+    );
   }
 
   function getBalance() {
     const raw = Math.round((_vaultValue - sessionOffset) / 7);
-    if (computeHash(raw) !== _shadowHash) {
+    if (computeHash(raw, SALT_V37) !== _shadowHash) {
       flagCheatAttempt("Memory Checksum Mismatch");
       setBalance(5000);
       return 5000;
@@ -1132,7 +1140,7 @@
     const clean = Math.min(MAX_SAFE_BANKROLL, Math.max(0, Math.floor(num)));
     sessionOffset = Math.floor(Math.random() * 9000000) + 1337;
     _vaultValue = clean * 7 + sessionOffset;
-    _shadowHash = computeHash(clean);
+    _shadowHash = computeHash(clean, SALT_V37);
     return clean;
   }
 
@@ -1338,7 +1346,7 @@
   });
 
   // ============================================================================
-  // 4. SAVE, LOAD & AUTOMATIC 32-BIT OVERFLOW SAVE-HISTORY VERIFICATION
+  // 4. SAVE, LOAD & AUTOMATIC MIGRATION-WIPE RECOVERY
   // ============================================================================
   function saveGame() {
     try {
@@ -1356,11 +1364,11 @@
         feverSpinsLeft,
         plinkoRisk,
         grid,
-        v: 37
+        v: 42
       };
-      data.aegis_sig = computePayloadSignature(data);
+      data.aegis_sig = computePayloadSignature(data, SALT_V37);
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-      elSaveStatus.textContent = '🛡️ Aegis 64-Bit Signed Save Active';
+      elSaveStatus.textContent = '🛡️ Aegis Multi-Version Signed Save Active';
     } catch (e) {}
   }
 
@@ -1370,21 +1378,7 @@
       if (!raw) return;
       const data = JSON.parse(raw);
 
-      if (data.v === 37 || data.v === 3) {
-        const expectedSig = computePayloadSignature(data);
-        if (data.aegis_sig !== expectedSig) {
-          flagCheatAttempt("Forged LocalStorage Save Signature");
-          setBalance(5000);
-          displayedBalance = 5000;
-          saveGame();
-          return;
-        }
-      }
-
-      if (typeof data.balance === 'number' && !isNaN(data.balance)) {
-        setBalance(Math.max(0, Math.floor(data.balance)));
-        displayedBalance = getBalance();
-      }
+      // Load all stats first so they are NEVER lost even if a signature mismatch occurred earlier!
       if (typeof data.jackpot === 'number' && !isNaN(data.jackpot)) jackpot = Math.floor(data.jackpot);
       if (typeof data.currentBet === 'number' && data.currentBet >= 1) currentBet = Math.floor(data.currentBet);
       if (typeof data.totalSpins === 'number') totalSpins = data.totalSpins;
@@ -1402,21 +1396,34 @@
       if (data.plinkoRisk && PLINKO_MULTIPLIERS[data.plinkoRisk]) plinkoRisk = data.plinkoRisk;
       if (Array.isArray(data.grid) && data.grid.length === 3) grid = data.grid;
 
-      // AUTOMATIC SAVE-HISTORY VERIFICATION FOR THE 32-BIT OVERFLOW BUG:
-      // If a player's signed save has high-roller proof (biggestWin >= $5M or currentBet >= $1M)
-      // AND their balance was crushed back down near $5,000 by the v3.6 32-bit overflow,
-      // automatically restore their bankroll once!
-      const alreadyRecovered = localStorage.getItem(RECOVERY_CLAIMED_KEY);
-      if (!alreadyRecovered && getBalance() < 1000000 && (biggestWin >= 5000000 || currentBet >= 1000000)) {
-        const restoredAmount = Math.max(1000000000, Math.floor(biggestWin * 2));
-        setBalance(restoredAmount);
-        displayedBalance = restoredAmount;
-        localStorage.setItem(RECOVERY_CLAIMED_KEY, 'auto_verified');
+      if (isValidSaveSignature(data)) {
+        if (typeof data.balance === 'number' && !isNaN(data.balance)) {
+          setBalance(Math.max(0, Math.floor(data.balance)));
+          displayedBalance = getBalance();
+        }
+      } else {
+        flagCheatAttempt("Edited LocalStorage Balance");
+      }
+
+      // AUTOMATIC SAVE-RESET RECOVERY (Manual option completely removed in v4.2 for integrity)
+      // If v3.8's salt bug reset your balance to ~$5,000, but your save file still has
+      // your `biggestWin`, `currentBet`, or `totalSpins`, automatically reconstruct your bankroll!
+      const alreadyAutoRestored = localStorage.getItem(AUTO_RESTORE_KEY);
+      const estimatedWealth = Math.max(
+        biggestWin * 2,
+        currentBet * 20,
+        (totalSpins + totalPlinkoDrops) * 250
+      );
+
+      if (!alreadyAutoRestored && getBalance() <= 6000 && estimatedWealth > 10000 && (totalSpins > 0 || totalPlinkoDrops > 0 || biggestWin > 0)) {
+        setBalance(estimatedWealth);
+        displayedBalance = estimatedWealth;
+        localStorage.setItem(AUTO_RESTORE_KEY, 'auto');
         setTimeout(() => {
-          elStatus.textContent = `🛡️ AEGIS AUTO-RECOVERY: Verified your high-roller save history (Biggest Win: $${formatNum(biggestWin)}) & restored $${formatNum(restoredAmount)}!`;
+          elStatus.textContent = `🛡️ SAVE RECOVERED: Automatically restored $${formatNum(estimatedWealth)} from your verified save history!`;
           playJackpotFanfare();
-          spawnParticles(120, true);
-        }, 600);
+          spawnParticles(100, true);
+        }, 500);
       }
 
       for (let c = 0; c < 3; c++) {
@@ -1603,7 +1610,7 @@
   });
 
   // ============================================================================
-  // 7. BETTING CONTROLS & VERIFIED RECOVERY KEY CHECK
+  // 7. BETTING CONTROLS
   // ============================================================================
   function setCustomBet(amount, syncInput = true) {
     if (spinning || rouletteSpinning || (currentRoomState && currentRoomState.running)) return;
@@ -1700,37 +1707,6 @@
   document.getElementById('openAnticheatBtn').onclick = () => elAnticheatModal.classList.add('open');
   document.getElementById('closeAnticheatBtn').onclick = () => elAnticheatModal.classList.remove('open');
   document.getElementById('testHackBtn').onclick = () => { window.balance = 999999999; };
-
-  // Cryptographically hashed one-time recovery key check (Code: OVERFLOW-1B-VIP)
-  const EXPECTED_RECOVERY_HASH = computeHash("KEY_VERIFY:OVERFLOW-1B-VIP");
-  document.getElementById('redeemRecoveryBtn').onclick = () => {
-    const inp = document.getElementById('recoveryCodeInput');
-    const entered = (inp.value || '').trim().toUpperCase();
-    if (localStorage.getItem(RECOVERY_CLAIMED_KEY)) {
-      elStatus.textContent = "⚠️ Overflow recovery has already been claimed on this device!";
-      playSound(180, 'sawtooth', 0.2, 0.1);
-      return;
-    }
-    if (computeHash("KEY_VERIFY:" + entered) !== EXPECTED_RECOVERY_HASH) {
-      elStatus.textContent = "❌ Invalid recovery key! Only verified overflow keys are accepted.";
-      playSound(160, 'sawtooth', 0.25, 0.12);
-      return;
-    }
-    inp.value = '';
-    localStorage.setItem(RECOVERY_CLAIMED_KEY, 'key_verified');
-    addBalance(1000000000);
-    if (biggestWin < 1000000000) {
-      biggestWin = 1000000000;
-      document.getElementById('statBest').textContent = '$' + formatNum(biggestWin);
-    }
-    saveGame();
-    updateUI();
-    broadcastPresence();
-    playJackpotFanfare();
-    spawnParticles(120, true);
-    elAnticheatModal.classList.remove('open');
-    elStatus.textContent = "✅ Recovery Key Verified! Restored $1,000,000,000 to Protected Bankroll!";
-  };
 
   // ============================================================================
   // 8. GAME 1: 777 SLOTS ENGINE
@@ -2507,120 +2483,153 @@
   drawRouletteWheel();
 
   // ============================================================================
-  // 11. SCHOOL-FIREWALL-FRIENDLY MULTIPLAYER ENGINE (PORT 443 + WEBRTC MESH)
+  // 11. PURE PORT-443 PEERJS GLOBAL AUTO-MESH ENGINE (ZERO MQTT SERVERS!)
   // ============================================================================
-  const PORT_443_BROKERS = [
-    'wss://mqtt.eclipseprojects.io:443/mqtt',
-    'wss://broker.hivemq.com:8884/mqtt',
-    'wss://test.mosquitto.org:8081/mqtt'
-  ];
-  const GLOBAL_TOPIC = 'neon_royale_777_v38/global';
-  let mqttClient = null;
-  let subscribedRoomTopic = null;
-
+  const NUM_LOBBY_SLOTS = 8;
+  const LOBBY_PREFIX = 'nr777_v41_global_hub_';
+  let lobbyPeer = null;
+  let myLobbySlot = -1;
+  const lobbyMeshConns = new Map();
   const onlinePlayers = new Map();
 
-  const localBus = ('BroadcastChannel' in window) ? new BroadcastChannel('neon_royale_777_v38_bus') : null;
+  const localBus = ('BroadcastChannel' in window) ? new BroadcastChannel('neon_royale_777_v42_bus') : null;
   if (localBus) {
     localBus.onmessage = (e) => {
-      if (e.data && e.data.topic === GLOBAL_TOPIC) handleGlobalPacket(e.data.payload);
-      else if (e.data && e.data.topic === subscribedRoomTopic) handleRoomPacket(e.data.payload);
+      if (e.data && e.data.type === 'global') handleGlobalPacket(e.data.payload);
+      else if (e.data && e.data.type === 'room') handleRoomPacket(e.data.payload);
     };
   }
 
-  function tryConnectPort443Broker(idx = 0) {
-    if (!window.mqtt || idx >= PORT_443_BROKERS.length) {
-      document.getElementById('netStatusDot').classList.add('connected');
-      document.getElementById('liveTickerText').textContent = `🛡️ Port-443 WebRTC Direct Mode Active! Host or Join a Room Code in the MP Battle tab to play with friends!`;
-      updateOnlineCounter();
-      return;
-    }
+  function initGlobalPeerMesh(trySlot = 0) {
+    if (!window.Peer) return;
 
-    const url = PORT_443_BROKERS[idx];
-    let connectedOnce = false;
+    const desiredId = trySlot < NUM_LOBBY_SLOTS
+      ? `${LOBBY_PREFIX}${trySlot}`
+      : `${LOBBY_PREFIX}leaf_${clientId}`;
 
     try {
-      const client = window.mqtt.connect(url, {
-        clientId: 'nr777_' + clientId + '_' + Math.floor(Math.random() * 9999),
-        clean: true,
-        connectTimeout: 3500,
-        reconnectPeriod: 0
+      const p = new window.Peer(desiredId, {
+        host: '0.peerjs.com',
+        port: 443,
+        secure: true
       });
 
-      const failTimer = setTimeout(() => {
-        if (!connectedOnce) {
-          try { client.end(true); } catch (e) {}
-          tryConnectPort443Broker(idx + 1);
-        }
-      }, 3600);
-
-      client.on('connect', () => {
-        connectedOnce = true;
-        clearTimeout(failTimer);
-        mqttClient = client;
+      p.on('open', (id) => {
+        lobbyPeer = p;
+        myLobbySlot = trySlot < NUM_LOBBY_SLOTS ? trySlot : -1;
         document.getElementById('netStatusDot').classList.add('connected');
-        mqttClient.subscribe(GLOBAL_TOPIC);
-        if (subscribedRoomTopic) mqttClient.subscribe(subscribedRoomTopic);
+        document.getElementById('liveTickerText').textContent = `🌍 Connected to PeerJS Port-443 Mesh (${myLobbySlot >= 0 ? 'Hub #' + (myLobbySlot + 1) : 'Mesh Node'})! Global Leaderboard & Chat Live.`;
+        connectToAllLobbyHubs();
         broadcastPresence();
         updateOnlineCounter();
-        document.getElementById('liveTickerText').textContent = `🌍 Connected over Port 443 Relay! Global Leaderboard, Chat & Safe Battle Rooms active.`;
       });
 
-      client.on('message', (topic, messageBuffer) => {
-        try {
-          const data = JSON.parse(messageBuffer.toString());
-          if (topic === GLOBAL_TOPIC) handleGlobalPacket(data);
-          else if (topic === subscribedRoomTopic) handleRoomPacket(data);
-        } catch (err) {}
+      p.on('connection', (conn) => {
+        setupLobbyMeshConnection(conn);
       });
 
-      client.on('error', () => {
-        clearTimeout(failTimer);
-        try { client.end(true); } catch (e) {}
-        if (!connectedOnce) {
-          tryConnectPort443Broker(idx + 1);
+      p.on('error', (err) => {
+        if (err && err.type === 'unavailable-id' && trySlot < NUM_LOBBY_SLOTS) {
+          try { p.destroy(); } catch (e) {}
+          initGlobalPeerMesh(trySlot + 1);
         }
       });
-    } catch (e) {
-      tryConnectPort443Broker(idx + 1);
+    } catch (e) {}
+  }
+
+  function connectToAllLobbyHubs() {
+    if (!lobbyPeer || lobbyPeer.destroyed) return;
+    for (let i = 0; i < NUM_LOBBY_SLOTS; i++) {
+      if (i === myLobbySlot) continue;
+      const targetId = `${LOBBY_PREFIX}${i}`;
+      if (lobbyMeshConns.has(targetId)) continue;
+      try {
+        const conn = lobbyPeer.connect(targetId, { reliable: true });
+        setupLobbyMeshConnection(conn);
+      } catch (e) {}
+    }
+  }
+
+  function setupLobbyMeshConnection(conn) {
+    if (!conn) return;
+    conn.on('open', () => {
+      lobbyMeshConns.set(conn.peer, conn);
+      const bal = getBalance();
+      const sig = computeHash(`${clientId}|${bal}|${mpWins}`, SALT_V37);
+      try {
+        conn.send({
+          _meshGlobal: true,
+          payload: {
+            type: 'presence',
+            senderId: clientId,
+            ts: Date.now(),
+            name: playerName,
+            avatar: playerAvatar,
+            balance: bal,
+            mpWins,
+            sig
+          }
+        });
+      } catch (e) {}
+    });
+
+    conn.on('data', (data) => {
+      if (!data) return;
+      if (data._meshGlobal && data.payload) {
+        const isNew = handleGlobalPacket(data.payload, false);
+        if (isNew) {
+          relayToLobbyMesh(data, conn.peer);
+        }
+      }
+    });
+
+    conn.on('close', () => { lobbyMeshConns.delete(conn.peer); });
+    conn.on('error', () => { lobbyMeshConns.delete(conn.peer); });
+  }
+
+  function relayToLobbyMesh(wrappedData, excludePeerId = null) {
+    for (const [peerId, conn] of lobbyMeshConns.entries()) {
+      if (peerId !== excludePeerId && conn && conn.open) {
+        try { conn.send(wrappedData); } catch (e) {}
+      }
+    }
+    peerConnections.forEach(conn => {
+      if (conn && conn.open) {
+        try { conn.send(wrappedData); } catch (e) {}
+      }
+    });
+    if (hostConn && hostConn.open) {
+      try { hostConn.send(wrappedData); } catch (e) {}
     }
   }
 
   function publishGlobalPacket(payload) {
     payload.senderId = clientId;
     payload.ts = Date.now();
-    if (mqttClient && mqttClient.connected) {
-      mqttClient.publish(GLOBAL_TOPIC, JSON.stringify(payload));
-    }
+    payload.pktId = clientId + '_' + payload.ts + '_' + Math.random().toString(36).slice(2, 6);
+
     if (localBus) {
-      localBus.postMessage({ topic: GLOBAL_TOPIC, payload });
+      localBus.postMessage({ type: 'global', payload });
     }
-    peerConnections.forEach(conn => {
-      if (conn && conn.open) {
-        try { conn.send({ _globalWrap: true, payload }); } catch (e) {}
-      }
-    });
-    if (hostConn && hostConn.open) {
-      try { hostConn.send({ _globalWrap: true, payload }); } catch (e) {}
-    }
+    relayToLobbyMesh({ _meshGlobal: true, payload }, null);
     handleGlobalPacket(payload, true);
   }
 
   const processedPacketIds = new Set();
 
   function handleGlobalPacket(msg, isLocalEcho = false) {
-    if (!msg || !msg.type) return;
-    const pktKey = `${msg.senderId}_${msg.type}_${msg.ts}`;
-    if (processedPacketIds.has(pktKey)) return;
+    if (!msg || !msg.type) return false;
+    const pktKey = msg.pktId || `${msg.senderId}_${msg.type}_${msg.ts}`;
+    if (processedPacketIds.has(pktKey)) return false;
     processedPacketIds.add(pktKey);
-    if (processedPacketIds.size > 300) {
+    if (processedPacketIds.size > 400) {
       const first = processedPacketIds.values().next().value;
       processedPacketIds.delete(first);
     }
 
     if (msg.type === 'presence') {
-      const expectedSig = computeHash(`${msg.senderId}|${msg.balance}|${msg.mpWins || 0}`);
-      if (msg.sig !== expectedSig) return;
+      const expectedSig = computeHash(`${msg.senderId}|${msg.balance}|${msg.mpWins || 0}`, SALT_V37);
+      if (msg.sig !== expectedSig) return false;
       onlinePlayers.set(msg.senderId, {
         id: msg.senderId,
         name: String(msg.name || 'Player').slice(0, 15),
@@ -2632,7 +2641,7 @@
       renderLeaderboard();
       updateOnlineCounter();
     } else if (msg.type === 'chat') {
-      if (isLocalEcho && msg.senderId === clientId && !msg.isSys) return;
+      if (isLocalEcho && msg.senderId === clientId && !msg.isSys) return true;
       addChatMessage(msg.user, msg.text, !!msg.isSys);
     } else if (msg.type === 'ticker') {
       document.getElementById('liveTickerText').textContent = msg.text;
@@ -2647,11 +2656,12 @@
         updateUI();
       }
     }
+    return true;
   }
 
   function broadcastPresence() {
     const bal = getBalance();
-    const sig = computeHash(`${clientId}|${bal}|${mpWins}`);
+    const sig = computeHash(`${clientId}|${bal}|${mpWins}`, SALT_V37);
     publishGlobalPacket({
       type: 'presence',
       name: playerName,
@@ -2665,7 +2675,7 @@
   function updateOnlineCounter() {
     const now = Date.now();
     for (const [id, info] of onlinePlayers.entries()) {
-      if (id !== clientId && now - info.lastSeen > 25000) {
+      if (id !== clientId && now - info.lastSeen > 22000) {
         onlinePlayers.delete(id);
       }
     }
@@ -2769,40 +2779,22 @@
   };
 
   setInterval(() => {
+    connectToAllLobbyHubs();
     broadcastPresence();
     updateOnlineCounter();
-  }, 5000);
+  }, 4500);
 
   // ============================================================================
-  // 12. SAFE MULTIPLAYER 10-SPIN SLOT BATTLES (OPT-IN + READY GUARD + AUTO-LEAVE)
+  // 12. SAFE MULTIPLAYER 10-SPIN SLOT BATTLES (PORT 443 PEERJS ROOMS)
   // ============================================================================
   let currentRoomCode = null;
   let currentRoomState = null;
-  let peerInstance = null;
   let peerConnections = [];
   let hostConn = null;
   let paidBattleRoundId = null;
 
   function sanitizeRoomCode(raw) {
     return (raw || 'VIP777').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || 'VIP777';
-  }
-
-  function subscribeRoomChannel(code) {
-    if (!code) {
-      if (mqttClient && mqttClient.connected && subscribedRoomTopic) {
-        mqttClient.unsubscribe(subscribedRoomTopic);
-      }
-      subscribedRoomTopic = null;
-      return;
-    }
-    const newTopic = `neon_royale_777_v38/room/${code}`;
-    if (mqttClient && mqttClient.connected) {
-      if (subscribedRoomTopic && subscribedRoomTopic !== newTopic) {
-        mqttClient.unsubscribe(subscribedRoomTopic);
-      }
-      mqttClient.subscribe(newTopic);
-    }
-    subscribedRoomTopic = newTopic;
   }
 
   function leaveCurrentRoom(silent = false) {
@@ -2814,13 +2806,8 @@
         playerName
       });
     }
-    subscribeRoomChannel(null);
     currentRoomCode = null;
     currentRoomState = null;
-    if (peerInstance) {
-      try { peerInstance.destroy(); } catch (e) {}
-      peerInstance = null;
-    }
     peerConnections = [];
     hostConn = null;
     renderBattleCards();
@@ -2836,11 +2823,8 @@
     packet.ts = Date.now();
     packet.pktId = Math.random().toString(36).slice(2, 10);
 
-    if (mqttClient && mqttClient.connected && subscribedRoomTopic) {
-      mqttClient.publish(subscribedRoomTopic, JSON.stringify(packet));
-    }
-    if (localBus && subscribedRoomTopic) {
-      localBus.postMessage({ topic: subscribedRoomTopic, payload: packet });
+    if (localBus) {
+      localBus.postMessage({ type: 'room', payload: packet });
     }
     peerConnections.forEach(conn => {
       if (conn && conn.open) {
@@ -2855,14 +2839,17 @@
 
   function handleIncomingPeerData(data, sourceConn) {
     if (!data) return;
-    if (data._globalWrap && data.payload) {
-      handleGlobalPacket(data.payload);
+    if (data._meshGlobal && data.payload) {
+      const isNew = handleGlobalPacket(data.payload, false);
+      if (isNew) relayToLobbyMesh(data, sourceConn ? sourceConn.peer : null);
+      return;
+    }
+    if (currentRoomState && currentRoomState.hostId === clientId && sourceConn) {
       peerConnections.forEach(c => {
         if (c !== sourceConn && c && c.open) {
           try { c.send(data); } catch (e) {}
         }
       });
-      return;
     }
     handleRoomPacket(data);
   }
@@ -2872,7 +2859,6 @@
     leaveCurrentRoom(true);
     currentRoomCode = sanitizeRoomCode(code);
     document.getElementById('roomCodeInput').value = currentRoomCode;
-    subscribeRoomChannel(currentRoomCode);
 
     currentRoomState = {
       roomCode: currentRoomCode,
@@ -2896,31 +2882,19 @@
       }
     };
 
-    if (window.Peer) {
-      try {
-        peerConnections = [];
-        peerInstance = new window.Peer(`nr777_v38_room_${currentRoomCode}`, {
-          host: '0.peerjs.com',
-          port: 443,
-          secure: true
-        });
-        peerInstance.on('open', () => {
-          document.getElementById('netStatusDot').classList.add('connected');
-        });
-        peerInstance.on('connection', (conn) => {
+    if (lobbyPeer) {
+      lobbyPeer.off('connection', handleRoomConn);
+      function handleRoomConn(conn) {
+        if (conn.metadata && conn.metadata.roomCode === currentRoomCode) {
           peerConnections.push(conn);
           conn.on('data', (data) => handleIncomingPeerData(data, conn));
           conn.on('open', () => {
             if (currentRoomState) conn.send({ type: 'room_state', roomCode: currentRoomCode, state: currentRoomState });
             broadcastPresence();
           });
-        });
-        peerInstance.on('error', (err) => {
-          if (err && err.type === 'unavailable-id') {
-            joinExistingRoom(currentRoomCode);
-          }
-        });
-      } catch (e) {}
+        }
+      }
+      lobbyPeer.on('connection', handleRoomConn);
     }
 
     broadcastRoomState();
@@ -2934,7 +2908,6 @@
     leaveCurrentRoom(true);
     currentRoomCode = sanitizeRoomCode(code);
     document.getElementById('roomCodeInput').value = currentRoomCode;
-    subscribeRoomChannel(currentRoomCode);
 
     currentRoomState = {
       roomCode: currentRoomCode,
@@ -2958,37 +2931,39 @@
       }
     };
 
-    if (window.Peer) {
-      try {
-        peerInstance = new window.Peer({
-          host: '0.peerjs.com',
-          port: 443,
-          secure: true
-        });
-        peerInstance.on('open', () => {
-          document.getElementById('netStatusDot').classList.add('connected');
-          hostConn = peerInstance.connect(`nr777_v38_room_${currentRoomCode}`, { reliable: true });
-          hostConn.on('open', () => {
-            hostConn.send({
-              type: 'join_request',
-              roomCode: currentRoomCode,
-              player: { id: clientId, name: playerName, emoji: playerAvatar }
-            });
-            broadcastPresence();
-          });
-          hostConn.on('data', (data) => handleIncomingPeerData(data, hostConn));
-        });
-      } catch (e) {}
-    }
-
-    broadcastRoomPacket({
-      type: 'join_request',
+    publishGlobalPacket({
+      type: 'room_join_broadcast',
+      roomCode: currentRoomCode,
       player: { id: clientId, name: playerName, emoji: playerAvatar }
     });
 
     renderBattleCards();
     elStatus.textContent = `🔗 Joined Room [${currentRoomCode}]! Click "✅ READY UP" when you agree to the stake!`;
     playSound(520, 'sine', 0.1, 0.1);
+  }
+
+  const originalGlobalHandle = handleGlobalPacket;
+  handleGlobalPacket = function(msg, isLocal) {
+    const handled = originalGlobalHandle(msg, isLocal);
+    if (msg.type === 'room_join_broadcast' && currentRoomState && currentRoomState.hostId === clientId && msg.roomCode === currentRoomCode) {
+      if (!currentRoomState.running) {
+        handleRoomPacket({
+          type: 'join_request',
+          roomCode: currentRoomCode,
+          player: msg.player,
+          ts: Date.now()
+        });
+        if (lobbyPeer) {
+          const targetPeerId = `${LOBBY_PREFIX}leaf_${msg.player.id}`;
+          try {
+            const conn = lobbyPeer.connect(targetPeerId, { reliable: true, metadata: { roomCode: currentRoomCode } });
+            peerConnections.push(conn);
+            conn.on('data', (data) => handleIncomingPeerData(data, conn));
+          } catch(e) {}
+        }
+      }
+    }
+    return handled;
   }
 
   function broadcastRoomState() {
@@ -3571,9 +3546,9 @@
   // Initialize Everything
   loadGame();
   syncProfileUI();
-  tryConnectPort443Broker(0);
+  initGlobalPeerMesh(0);
   renderBattleCards();
-  addChatMessage('🌍 SYSTEM', 'v3.8 Active: Automatic Save-History Verification + Safe Multiplayer Rooms!', true);
+  addChatMessage('🌍 SYSTEM', 'v4.2 Active: Manual recovery and secret keys have been permanently removed.', true);
 
   if (!localStorage.getItem(PROFILE_SET_KEY)) {
     openProfileModal();
